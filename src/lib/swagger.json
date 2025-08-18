@@ -1,0 +1,2852 @@
+{
+  "schemes": [],
+  "swagger": "2.0",
+  "info": {
+    "description": "Directus-style API with Role-Based Access Control (RBAC). A powerful, generic API that provides CRUD operations for any database table with comprehensive security, multi-tenancy, and dynamic schema management.",
+    "title": "Basin API",
+    "contact": {},
+    "version": "1.0.0"
+  },
+  "host": "",
+  "basePath": "/",
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "parameters": [
+          {
+            "description": "Login payload",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.LoginResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve information about the currently authenticated user. Requires valid JWT Bearer token or API key.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get current user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.User"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/api-keys": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of API keys in the system. Requires authentication and API key management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-api-keys"
+        ],
+        "summary": "List API keys",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (name, user_id, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by API key name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by user ID",
+            "name": "user_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new API key in the system. Requires authentication and API key creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-api-keys"
+        ],
+        "summary": "Create API key",
+        "parameters": [
+          {
+            "description": "API Key data (name, user_id, permissions)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/api-keys/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific API key by ID. Requires authentication and API key management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-api-keys"
+        ],
+        "summary": "Get API key",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "API Key ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing API key. Requires authentication and API key update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-api-keys"
+        ],
+        "summary": "Update API key",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "API Key ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "API Key data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete an API key from the system. Requires authentication and API key deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-api-keys"
+        ],
+        "summary": "Delete API key",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "API Key ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/collections": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of collections in the system. Requires authentication and collection management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-collections"
+        ],
+        "summary": "List collections",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (name, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by collection name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by icon",
+            "name": "icon",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Filter by primary status",
+            "name": "is_primary",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new collection in the system. Requires authentication and collection creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-collections"
+        ],
+        "summary": "Create collection",
+        "parameters": [
+          {
+            "description": "Collection data (name, description, icon, is_primary, tenant_id)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/collections/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific collection by ID. Requires authentication and collection management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-collections"
+        ],
+        "summary": "Get collection",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Collection ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing collection. Requires authentication and collection update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-collections"
+        ],
+        "summary": "Update collection",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Collection ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Collection data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete a collection from the system. Requires authentication and collection deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-collections"
+        ],
+        "summary": "Delete collection",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Collection ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/fields": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of fields in the system. Requires authentication and field management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-fields"
+        ],
+        "summary": "List fields",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (name, collection_id, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by field name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by collection ID",
+            "name": "collection_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by field type (text, integer, boolean, jsonb, timestamp, uuid)",
+            "name": "field_type",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Filter by primary status",
+            "name": "is_primary",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new field in the system. Requires authentication and field creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-fields"
+        ],
+        "summary": "Create field",
+        "parameters": [
+          {
+            "description": "Field data (name, collection_id, field_type, is_required, is_primary, validation_rules, tenant_id)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/fields/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific field by ID. Requires authentication and field management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-fields"
+        ],
+        "summary": "Get field",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Field ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing field. Requires authentication and field update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-fields"
+        ],
+        "summary": "Update field",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Field ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Field data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete a field from the system. Requires authentication and field deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-fields"
+        ],
+        "summary": "Delete field",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Field ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/permissions": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of permissions in the system. Requires authentication and permission management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-permissions"
+        ],
+        "summary": "List permissions",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (table_name, action, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by table name",
+            "name": "table_name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by action (read, create, update, delete)",
+            "name": "action",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by role ID",
+            "name": "role_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new permission in the system. Requires authentication and permission creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-permissions"
+        ],
+        "summary": "Create permission",
+        "parameters": [
+          {
+            "description": "Permission data (role_id, table_name, action, tenant_id)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/permissions/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific permission by ID. Requires authentication and permission management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-permissions"
+        ],
+        "summary": "Get permission",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Permission ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing permission. Requires authentication and permission update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-permissions"
+        ],
+        "summary": "Update permission",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Permission ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Permission data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete a permission from the system. Requires authentication and permission deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-permissions"
+        ],
+        "summary": "Delete permission",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Permission ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/roles": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of roles in the system. Requires authentication and role management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-roles"
+        ],
+        "summary": "List roles",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (name, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by role name",
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new role in the system. Requires authentication and role creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-roles"
+        ],
+        "summary": "Create role",
+        "parameters": [
+          {
+            "description": "Role data (name, description, tenant_id)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/roles/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific role by ID. Requires authentication and role management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-roles"
+        ],
+        "summary": "Get role",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Role ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing role. Requires authentication and role update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-roles"
+        ],
+        "summary": "Update role",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Role ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Role data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete a role from the system. Requires authentication and role deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-roles"
+        ],
+        "summary": "Delete role",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Role ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/users": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a list of users in the system. Requires authentication and user management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-users"
+        ],
+        "summary": "List users",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Limit (max 500)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (email, first_name, last_name, created_at)",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Filter by email",
+            "name": "email",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Filter by active status",
+            "name": "is_active",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new user in the system. Requires authentication and user creation permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-users"
+        ],
+        "summary": "Create user",
+        "parameters": [
+          {
+            "description": "User data (email, first_name, last_name, password, role_id, tenant_id)",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/users/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific user by ID. Requires authentication and user management permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-users"
+        ],
+        "summary": "Get user",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "User ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing user. Requires authentication and user update permissions.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-users"
+        ],
+        "summary": "Update user",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "User ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "User data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete a user from the system. Requires authentication and user deletion permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "core-users"
+        ],
+        "summary": "Delete user",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "User ID (UUID)",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/{table}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a paginated list of items from any dynamic table in the system. This endpoint works with both core schema tables (users, roles, permissions, collections, fields, api-keys) and custom dynamic tables (e.g., blog_posts, customers, products). The API automatically adapts to the table's schema, applying filters, sorting, and pagination. Requires authentication via JWT Bearer token or API key.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "items"
+        ],
+        "summary": "List items from dynamic table",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Table name (e.g., 'users', 'blog_posts', 'customers')",
+            "name": "table",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "description": "Limit (max 500, default 25)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset for pagination",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page number (1-based, alternative to offset)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Items per page (alternative to limit)",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field (e.g., 'created_at', 'name', 'email')",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort order: ASC or DESC (default: DESC)",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "JSON filter object for advanced filtering",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Limit",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page (1-based)",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Per page",
+            "name": "per_page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Sort field",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "ASC or DESC",
+            "name": "order",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Create a new item in any dynamic table in the system. This endpoint works with both core schema tables and custom dynamic tables. The item structure depends on the table's schema (fields, validation rules, etc.). Requires authentication via JWT Bearer token or API key.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "items"
+        ],
+        "summary": "Create item in dynamic table",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Table name (e.g., 'users', 'blog_posts', 'customers')",
+            "name": "table",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Item data",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/models.CreateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/items/{table}/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Retrieve a specific item by ID from any dynamic table in the system. This endpoint works with both core schema tables and custom dynamic tables. Requires authentication via JWT Bearer token or API key.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "items"
+        ],
+        "summary": "Get item from dynamic table",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Table name (e.g., 'users', 'blog_posts', 'customers')",
+            "name": "table",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Item ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.ItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Update an existing item in any dynamic table in the system. This endpoint works with both core schema tables and custom dynamic tables. Only the fields provided in the request body will be updated. Requires authentication via JWT Bearer token or API key.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "items"
+        ],
+        "summary": "Update item in dynamic table",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Table name (e.g., 'users', 'blog_posts', 'customers')",
+            "name": "table",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Item ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Item data to update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.UpdateItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "description": "Delete an item from any dynamic table in the system. This endpoint works with both core schema tables and custom dynamic tables. The deletion is permanent and cannot be undone. Requires authentication via JWT Bearer token or API key.",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "items"
+        ],
+        "summary": "Delete item from dynamic table",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Table name (e.g., 'users', 'blog_posts', 'customers')",
+            "name": "table",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Item ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.DeleteItemResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "models.CreateItemMeta": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Item created successfully"
+        },
+        "table": {
+          "type": "string",
+          "example": "customers"
+        }
+      }
+    },
+    "models.CreateItemResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "meta": {
+          "$ref": "#/definitions/models.CreateItemMeta"
+        }
+      }
+    },
+    "models.DeleteItemMeta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "message": {
+          "type": "string",
+          "example": "Item deleted successfully"
+        },
+        "table": {
+          "type": "string",
+          "example": "customers"
+        }
+      }
+    },
+    "models.DeleteItemResponse": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/models.DeleteItemMeta"
+        }
+      }
+    },
+    "models.ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "INVALID_TABLE"
+        },
+        "details": {
+          "type": "string",
+          "example": "Table 'invalid_table' does not exist or is not accessible"
+        },
+        "error": {
+          "type": "string",
+          "example": "Invalid table name"
+        }
+      }
+    },
+    "models.ItemMeta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "table": {
+          "type": "string",
+          "example": "customers"
+        }
+      }
+    },
+    "models.ItemResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "meta": {
+          "$ref": "#/definitions/models.ItemMeta"
+        }
+      }
+    },
+    "models.ItemsListMeta": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "example": 25
+        },
+        "limit": {
+          "type": "integer",
+          "example": 25
+        },
+        "offset": {
+          "type": "integer",
+          "example": 0
+        },
+        "table": {
+          "type": "string",
+          "example": "customers"
+        },
+        "total": {
+          "type": "integer",
+          "example": 100
+        },
+        "type": {
+          "type": "string",
+          "example": "data"
+        }
+      }
+    },
+    "models.ItemsListResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "meta": {
+          "$ref": "#/definitions/models.ItemsListMeta"
+        }
+      }
+    },
+    "models.LoginRequest": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "models.LoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/models.User"
+        }
+      }
+    },
+    "models.UpdateItemMeta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "table": {
+          "type": "string",
+          "example": "customers"
+        }
+      }
+    },
+    "models.UpdateItemResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "meta": {
+          "$ref": "#/definitions/models.UpdateItemMeta"
+        }
+      }
+    },
+    "models.User": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "description": "API key for programmatic access (format: Bearer YOUR_API_KEY)",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "BearerAuth": {
+      "description": "JWT Bearer token for user authentication",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

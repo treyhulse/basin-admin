@@ -1,0 +1,100 @@
+'use client';
+
+import { useAuth } from '@/components/providers/auth-provider';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LogOut, User, Database, Settings, Users } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import ProtectedRoute from '@/components/auth/protected-route';
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: Database },
+  { name: 'Collections', href: '/dashboard/collections', icon: Database },
+  { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+];
+
+function DashboardLayoutContent({ children }: DashboardLayoutProps) {
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold text-gray-900">Basin Admin</h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <User className="h-5 w-5 text-gray-400" />
+                <span className="text-sm text-gray-700">
+                  {user?.first_name} {user?.last_name}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-sm min-h-screen">
+          <nav className="mt-8">
+            <div className="px-4 space-y-1">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+                
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon className="mr-3 h-5 w-5" />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 p-8">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  return (
+    <ProtectedRoute>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </ProtectedRoute>
+  );
+}

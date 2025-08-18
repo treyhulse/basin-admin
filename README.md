@@ -13,7 +13,8 @@ basin-admin/    # Next.js admin UI (new)
 - Next.js (App Router) + TypeScript
 - Tailwind CSS + shadcn/ui
 - TanStack Query (React Query)
-- OpenAPI-generated client in `./swagger.json`
+- OpenAPI 3.0 specification in `./src/lib/openapi.json`
+- Swagger 2.0 specification in `./src/lib/swagger.json` (legacy)
 
 ## Create the app
 ```bash
@@ -24,15 +25,40 @@ npm add @tanstack/react-query zod axios @zodios/core
 npm add -D openapi-typescript
 ```
 
-## Generate API types (ignore this for now, just use the swagger.json file in the project root)
-```bash
-# from repo root
-npx openapi-typescript http://localhost:8080/swagger/doc.json -o basin-admin/src/lib/api-types.ts
+## API Specifications
 
-# This will generate TypeScript types from the Swagger spec
-# The types will automatically update when the API changes
-# You can also view the API docs at http://localhost:8080/swagger/index.html
+This project automatically maintains two API specification formats:
+
+- **Swagger 2.0** (`./src/lib/swagger.json`) - Fetched directly from your backend for interactive docs
+- **OpenAPI 3.0.0** (`./src/lib/openapi.json`) - Automatically converted from Swagger 2.0 for type generation
+
+**Note:** Both files are automatically kept in sync using the update script. The backend serves Swagger UI from the Swagger 2.0 spec, while the OpenAPI 3.0 spec is used for generating TypeScript types.
+
+## Generate API types
+```bash
+# from basin-admin directory
+npm run generate-types
+
+# This will generate TypeScript types from the local OpenAPI 3.0 spec file
+# The types will automatically update when you regenerate them
+# You can also view the API docs at http://localhost:8080/swagger/index.html (Swagger UI)
 ```
+
+## Maintaining API Specifications
+
+When your API changes, simply run one command to update everything:
+
+```bash
+npm run update-api
+```
+
+This command will:
+1. **Fetch the latest Swagger 2.0** from your backend at `http://localhost:8080/swagger/doc.json`
+2. **Automatically convert it to OpenAPI 3.0** format
+3. **Save both specification files** in the correct locations
+4. **Generate TypeScript types** automatically
+
+Everything is updated in one go! 🎉
 
 ## Basic API client
 ```ts
@@ -80,6 +106,7 @@ Backend includes permissive CORS for dev. In production, restrict to your admin 
   - Add new endpoints
   - Modify existing endpoints
   - Run `make start` or `make docs` on the backend
+- To regenerate types after API changes, run the generate command again
 
 ## Next steps
 - Add role/permission editor pages
