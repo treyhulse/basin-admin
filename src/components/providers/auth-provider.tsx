@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.login(email, password);
       const { token, user: userData } = response;
       
+      // Store token in cookie and localStorage
       setAuthToken(token);
       setUser(userData);
     } catch (error) {
@@ -63,18 +64,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = getAuthToken();
-      
-      if (token && isTokenValid(token)) {
-        try {
+      try {
+        const token = getAuthToken();
+        
+        if (token && isTokenValid(token)) {
+          // Token exists and is valid, try to get user data
           await refreshUser();
-        } catch (error) {
-          console.error('Failed to initialize auth:', error);
-          logout();
+        } else if (token) {
+          // Token exists but is invalid, remove it
+          removeAuthToken();
         }
+      } catch (error) {
+        console.error('Failed to initialize auth:', error);
+        removeAuthToken();
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     initializeAuth();

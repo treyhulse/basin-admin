@@ -3,9 +3,7 @@ import { getAuthToken, removeAuthToken } from './auth';
 
 export const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 10000,
 });
 
 // Request interceptor to add auth token
@@ -24,34 +22,265 @@ api.interceptors.request.use(
 
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, remove it
       removeAuthToken();
-      // Redirect to login if we're in the browser
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-// Auth API calls
+// Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
     const response = await api.post('/auth/login', { email, password });
     return response.data;
   },
-  
   getCurrentUser: async () => {
     const response = await api.get('/auth/me');
     return response.data;
   },
 };
 
-// Generic items API calls
+// Users API
+export const usersAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    email?: string;
+    is_active?: boolean;
+  }) => {
+    const response = await api.get('/items/users', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/users/${id}`);
+    return response.data;
+  },
+  create: async (userData: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    role_id: string;
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/users', userData);
+    return response.data;
+  },
+  update: async (id: string, userData: any) => {
+    const response = await api.put(`/items/users/${id}`, userData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/users/${id}`);
+    return response.data;
+  },
+};
+
+// Roles API
+export const rolesAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    name?: string;
+  }) => {
+    const response = await api.get('/items/roles', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/roles/${id}`);
+    return response.data;
+  },
+  create: async (roleData: {
+    name: string;
+    description: string;
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/roles', roleData);
+    return response.data;
+  },
+  update: async (id: string, roleData: any) => {
+    const response = await api.put(`/items/roles/${id}`, roleData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/roles/${id}`);
+    return response.data;
+  },
+};
+
+// Permissions API
+export const permissionsAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    table_name?: string;
+    action?: string;
+    role_id?: string;
+  }) => {
+    const response = await api.get('/items/permissions', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/permissions/${id}`);
+    return response.data;
+  },
+  create: async (permissionData: {
+    role_id: string;
+    table_name: string;
+    action: string;
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/permissions', permissionData);
+    return response.data;
+  },
+  update: async (id: string, permissionData: any) => {
+    const response = await api.put(`/items/permissions/${id}`, permissionData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/permissions/${id}`);
+    return response.data;
+  },
+};
+
+// Collections API
+export const collectionsAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    name?: string;
+    icon?: string;
+    is_primary?: boolean;
+  }) => {
+    const response = await api.get('/items/collections', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/collections/${id}`);
+    return response.data;
+  },
+  create: async (collectionData: {
+    name: string;
+    description: string;
+    icon?: string;
+    is_primary?: boolean;
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/collections', collectionData);
+    return response.data;
+  },
+  update: async (id: string, collectionData: any) => {
+    const response = await api.put(`/items/collections/${id}`, collectionData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/collections/${id}`);
+    return response.data;
+  },
+};
+
+// Fields API
+export const fieldsAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    name?: string;
+    collection_id?: string;
+    field_type?: string;
+    is_primary?: boolean;
+  }) => {
+    const response = await api.get('/items/fields', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/fields/${id}`);
+    return response.data;
+  },
+  create: async (fieldData: {
+    name: string;
+    collection_id: string;
+    field_type: string;
+    is_required?: boolean;
+    is_primary?: boolean;
+    validation_rules?: any;
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/fields', fieldData);
+    return response.data;
+  },
+  update: async (id: string, fieldData: any) => {
+    const response = await api.put(`/items/fields/${id}`, fieldData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/fields/${id}`);
+    return response.data;
+  },
+};
+
+// API Keys API
+export const apiKeysAPI = {
+  list: async (params?: {
+    limit?: number;
+    offset?: number;
+    page?: number;
+    per_page?: number;
+    sort?: string;
+    order?: string;
+    name?: string;
+    user_id?: string;
+  }) => {
+    const response = await api.get('/items/api-keys', { params });
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/items/api-keys/${id}`);
+    return response.data;
+  },
+  create: async (apiKeyData: {
+    name: string;
+    user_id: string;
+    permissions: string[];
+    tenant_id?: string;
+  }) => {
+    const response = await api.post('/items/api-keys', apiKeyData);
+    return response.data;
+  },
+  update: async (id: string, apiKeyData: any) => {
+    const response = await api.put(`/items/api-keys/${id}`, apiKeyData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/items/api-keys/${id}`);
+    return response.data;
+  },
+};
+
+// Generic items API for dynamic tables
 export const itemsAPI = {
   list: async (table: string, params?: {
     limit?: number;
@@ -59,27 +288,24 @@ export const itemsAPI = {
     page?: number;
     per_page?: number;
     sort?: string;
-    order?: 'ASC' | 'DESC';
+    order?: string;
+    filter?: string;
   }) => {
     const response = await api.get(`/items/${table}`, { params });
     return response.data;
   },
-  
   get: async (table: string, id: string) => {
     const response = await api.get(`/items/${table}/${id}`);
     return response.data;
   },
-  
   create: async (table: string, data: any) => {
     const response = await api.post(`/items/${table}`, data);
     return response.data;
   },
-  
   update: async (table: string, id: string, data: any) => {
     const response = await api.put(`/items/${table}/${id}`, data);
     return response.data;
   },
-  
   delete: async (table: string, id: string) => {
     const response = await api.delete(`/items/${table}/${id}`);
     return response.data;

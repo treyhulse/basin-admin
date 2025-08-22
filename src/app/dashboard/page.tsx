@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Database, Users, Settings, Plus } from 'lucide-react';
+import { Database, Users, Settings, Plus, Table, Key, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
 
 export default function DashboardPage() {
   return (
@@ -8,12 +9,12 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-2">
-          Welcome to your Basin Admin dashboard. Manage your collections, users, and settings.
+          Welcome to your Basin Admin dashboard. Manage your collections, users, and system configuration.
         </p>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Collections</CardTitle>
@@ -42,13 +43,26 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">API Calls</CardTitle>
-            <Settings className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">API Keys</CardTitle>
+            <Key className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground">
+              Active integrations
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Data Items</CardTitle>
+            <Table className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,234</div>
             <p className="text-xs text-muted-foreground">
-              This month
+              Total records
             </p>
           </CardContent>
         </Card>
@@ -58,9 +72,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>Data Management</CardTitle>
             <CardDescription>
-              Common tasks to get you started
+              Manage your data collections and view data
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -70,19 +84,19 @@ export default function DashboardPage() {
             >
               <Database className="h-5 w-5 text-blue-600 mr-3" />
               <div>
-                <div className="font-medium">Manage Collections</div>
-                <div className="text-sm text-gray-600">View and edit your data collections</div>
+                <div className="font-medium">Collections</div>
+                <div className="text-sm text-gray-600">Configure data structure and fields</div>
               </div>
             </Link>
             
             <Link
-              href="/dashboard/users"
+              href="/dashboard/data-views"
               className="flex items-center p-3 rounded-lg border hover:bg-gray-50 transition-colors"
             >
-              <Users className="h-5 w-5 text-green-600 mr-3" />
+              <Table className="h-5 w-5 text-green-600 mr-3" />
               <div>
-                <div className="font-medium">User Management</div>
-                <div className="text-sm text-gray-600">Manage users and permissions</div>
+                <div className="font-medium">Data Views</div>
+                <div className="text-sm text-gray-600">View and manage data in different formats</div>
               </div>
             </Link>
           </CardContent>
@@ -90,35 +104,62 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Administration</CardTitle>
             <CardDescription>
-              Latest changes and updates
+              Manage users, permissions, and system settings
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                <div className="text-sm">
-                  <span className="font-medium">New collection created:</span> Products
-                </div>
+          <CardContent className="space-y-3">
+            <Link
+              href="/dashboard/users"
+              className="flex items-center p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+            >
+              <Users className="h-5 w-5 text-purple-600 mr-3" />
+              <div>
+                <div className="font-medium">User Management</div>
+                <div className="text-sm text-gray-600">Manage system users and accounts</div>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                <div className="text-sm">
-                  <span className="font-medium">User registered:</span> john@example.com
-                </div>
+            </Link>
+            
+            <Link
+              href="/dashboard/roles"
+              className="flex items-center p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+            >
+              <Shield className="h-5 w-5 text-orange-600 mr-3" />
+              <div>
+                <div className="font-medium">Roles & Permissions</div>
+                <div className="text-sm text-gray-600">Configure access control</div>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-yellow-600 rounded-full"></div>
-                <div className="text-sm">
-                  <span className="font-medium">API endpoint updated:</span> /items/customers
-                </div>
-              </div>
-            </div>
+            </Link>
           </CardContent>
         </Card>
       </div>
+
+      {/* System Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>System Information</CardTitle>
+          <CardDescription>
+            Current system status and configuration
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label className="text-sm font-medium text-gray-500">Version</Label>
+              <p className="text-sm text-gray-900">1.0.0</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-500">Environment</Label>
+              <p className="text-sm text-gray-900">Development</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-500">Last Updated</Label>
+              <p className="text-sm text-gray-900">2024-01-30</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

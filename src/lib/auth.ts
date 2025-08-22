@@ -27,22 +27,37 @@ export interface JWTPayload {
   iat: number;
 }
 
-// JWT token management
+// JWT token management - using cookies only for better security
 export const AUTH_TOKEN_KEY = 'basin_auth_token';
 
 export const getAuthToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  // Get token from cookie only
+  const cookies = document.cookie.split(';');
+  const tokenCookie = cookies.find(cookie => 
+    cookie.trim().startsWith(`${AUTH_TOKEN_KEY}=`)
+  );
+  
+  if (tokenCookie) {
+    return tokenCookie.split('=')[1];
+  }
+  
+  return null;
 };
 
 export const setAuthToken = (token: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  
+  // Set cookie only - no localStorage
+  document.cookie = `${AUTH_TOKEN_KEY}=${token}; path=/; max-age=86400; SameSite=Strict`;
 };
 
 export const removeAuthToken = (): void => {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(AUTH_TOKEN_KEY);
+  
+  // Remove cookie only
+  document.cookie = `${AUTH_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 };
 
 export const isTokenValid = (token: string): boolean => {
