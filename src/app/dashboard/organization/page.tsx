@@ -14,14 +14,14 @@ export default function OrganizationPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Organization</h1>
+          <h1 className="text-3xl font-bold">Organization</h1>
         </div>
         
         <Card>
           <CardContent className="p-8 text-center">
-            <Building2 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Organization Selected</h3>
-            <p className="text-gray-500 mb-4">
+            <Building2 className="mx-auto h-12 w-12 mb-4" />
+            <h3 className="text-lg font-medium mb-2">No Organization Selected</h3>
+            <p className="mb-4">
               You are not currently associated with any organization.
             </p>
             <Button variant="outline">
@@ -36,7 +36,7 @@ export default function OrganizationPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Organization</h1>
+        <h1 className="text-3xl font-bold">Organization</h1>
         <Button variant="outline" size="sm">
           <Settings className="h-4 w-4 mr-2" />
           Settings
@@ -47,7 +47,7 @@ export default function OrganizationPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-3">
-            <Building2 className="h-6 w-6 text-blue-600" />
+            <Building2 className="h-6 w-6" />
             <span>{tenant.name}</span>
             <Badge variant={tenant.is_active ? "default" : "secondary"}>
               {tenant.is_active ? "Active" : "Inactive"}
@@ -59,31 +59,31 @@ export default function OrganizationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Organization ID</label>
-                <p className="text-sm text-gray-900 font-mono">{tenant.id}</p>
+                <label className="text-sm font-medium">Organization ID</label>
+                <p className="text-sm font-mono">{tenant.id}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Slug</label>
-                <p className="text-sm text-gray-900">{tenant.slug}</p>
+                <label className="text-sm font-medium">Slug</label>
+                <p className="text-sm">{tenant.slug}</p>
               </div>
               {tenant.domain && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Domain</label>
-                  <p className="text-sm text-gray-900">{tenant.domain}</p>
+                  <label className="text-sm font-medium">Domain</label>
+                  <p className="text-sm">{tenant.domain}</p>
                 </div>
               )}
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Created</label>
-                <p className="text-sm text-gray-900">
+                <label className="text-sm font-medium">Created</label>
+                <p className="text-sm">
                   {tenant.created_at ? format(new Date(tenant.created_at), 'PPP') : 'N/A'}
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Last Updated</label>
-                <p className="text-sm text-gray-900">
+                <label className="text-sm font-medium">Last Updated</label>
+                <p className="text-sm">
                   {tenant.updated_at ? format(new Date(tenant.updated_at), 'PPP') : 'N/A'}
                 </p>
               </div>
@@ -92,11 +92,11 @@ export default function OrganizationPage() {
 
           {/* Status Indicators */}
           <div className="border-t pt-6">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">Status</h4>
+            <h4 className="text-sm font-medium mb-4">Status</h4>
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
                 <div className={`w-3 h-3 rounded-full ${tenant.is_active ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm">
                   {tenant.is_active ? 'Organization is active' : 'Organization is inactive'}
                 </span>
               </div>
@@ -114,18 +114,18 @@ export default function OrganizationPage() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Session ID</label>
-                <p className="text-sm text-gray-900 font-mono">{session.id}</p>
+                <label className="text-sm font-medium">Session ID</label>
+                <p className="text-sm font-mono">{session.id}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Expires At</label>
-                <p className="text-sm text-gray-900">
+                <label className="text-sm font-medium">Expires At</label>
+                <p className="text-sm">
                   {session.expires_at ? format(new Date(session.expires_at), 'PPP p') : 'N/A'}
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Raw Session Object</label>
-                <pre className="text-xs bg-gray-100 p-3 rounded-md overflow-x-auto">
+                <label className="text-sm font-medium">Raw Session Object</label>
+                <pre className="text-xs p-3 rounded-md overflow-x-auto">
                   {JSON.stringify(session, null, 2)}
                 </pre>
               </div>
@@ -143,15 +143,15 @@ export default function OrganizationPage() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Is Admin</label>
-                <p className="text-sm text-gray-900">
+                <label className="text-sm font-medium">Is Admin</label>
+                <p className="text-sm">
                   <Badge variant={auth.is_admin ? "default" : "secondary"}>
                     {auth.is_admin ? "Yes" : "No"}
                   </Badge>
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Roles</label>
+                <label className="text-sm font-medium">Roles</label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {auth.roles.map((role) => (
                     <Badge key={role} variant="outline">{role}</Badge>
@@ -159,7 +159,7 @@ export default function OrganizationPage() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Permissions</label>
+                <label className="text-sm font-medium">Permissions</label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {auth.permissions.map((permission) => (
                     <Badge key={permission} variant="outline">{permission}</Badge>
@@ -167,8 +167,8 @@ export default function OrganizationPage() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Raw Auth Object</label>
-                <pre className="text-xs bg-gray-100 p-3 rounded-md overflow-x-auto">
+                <label className="text-sm font-medium">Raw Auth Object</label>
+                <pre className="text-xs p-3 rounded-md overflow-x-auto">
                   {JSON.stringify(auth, null, 2)}
                 </pre>
               </div>
@@ -182,10 +182,10 @@ export default function OrganizationPage() {
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Users className="h-8 w-8 text-blue-600" />
+              <Users className="h-8 w-8" />
               <div>
-                <h3 className="font-medium text-gray-900">Manage Users</h3>
-                <p className="text-sm text-gray-500">Add, remove, and manage organization members</p>
+                <h3 className="font-medium">Manage Users</h3>
+                <p className="text-sm">Add, remove, and manage organization members</p>
               </div>
             </div>
           </CardContent>
@@ -194,10 +194,10 @@ export default function OrganizationPage() {
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Shield className="h-8 w-8 text-green-600" />
+              <Shield className="h-8 w-8" />
               <div>
-                <h3 className="font-medium text-gray-900">Roles & Permissions</h3>
-                <p className="text-sm text-gray-500">Configure access control and user roles</p>
+                <h3 className="font-medium">Roles & Permissions</h3>
+                <p className="text-sm">Configure access control and user roles</p>
               </div>
             </div>
           </CardContent>
@@ -206,10 +206,10 @@ export default function OrganizationPage() {
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Globe className="h-8 w-8 text-purple-600" />
+              <Globe className="h-8 w-8" />
               <div>
-                <h3 className="font-medium text-gray-900">Domain Settings</h3>
-                <p className="text-sm text-gray-500">Configure custom domain and branding</p>
+                <h3 className="font-medium">Domain Settings</h3>
+                <p className="text-sm">Configure custom domain and branding</p>
               </div>
             </div>
           </CardContent>
@@ -225,21 +225,21 @@ export default function OrganizationPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-medium">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                  <span className="font-medium">
                     {user.first_name?.[0]}{user.last_name?.[0]}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium">
                     {user.first_name} {user.last_name}
                   </p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className="text-sm">{user.email}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-500">Member since</p>
-                <p className="text-sm text-gray-900">
+                <p className="text-sm">Member since</p>
+                <p className="text-sm">
                   {user.created_at ? format(new Date(user.created_at), 'PPP') : 'N/A'}
                 </p>
               </div>

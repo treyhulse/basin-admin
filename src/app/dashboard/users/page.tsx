@@ -6,42 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Users, Mail, Calendar } from 'lucide-react';
-import { usersAPI, rolesAPI } from '@/lib/api';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Plus, Search, Filter, Edit, Trash2, Mail, Calendar, Shield } from 'lucide-react';
+import { usersAPI } from '@/lib/api';
 
 interface User {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
   is_active: boolean;
-  role_id: string;
+  role: string;
   created_at: string;
-  updated_at: string;
-}
-
-interface Role {
-  id: string;
-  name: string;
-  description: string;
+  last_login?: string;
 }
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: '',
-    first_name: '',
-    last_name: '',
-    password: '',
-    role_id: '',
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
 
   useEffect(() => {
     fetchUsers();
-    fetchRoles();
   }, []);
 
   const fetchUsers = async () => {
@@ -56,34 +44,20 @@ export default function UsersPage() {
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const response = await rolesAPI.list({ limit: 100 });
-      setRoles(response.data || []);
-    } catch (error) {
-      console.error('Failed to fetch roles:', error);
-    }
-  };
-
-  const handleCreateUser = async () => {
-    try {
-      await usersAPI.create(newUser);
-      setNewUser({
-        email: '',
-        first_name: '',
-        last_name: '',
-        password: '',
-        role_id: '',
-      });
-      setIsCreatingUser(false);
-      fetchUsers(); // Refresh the list
-    } catch (error) {
-      console.error('Failed to create user:', error);
-    }
-  };
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = !roleFilter || user.role === roleFilter;
+    const matchesStatus = !statusFilter || 
+                         (statusFilter === 'active' && user.is_active) ||
+                         (statusFilter === 'inactive' && !user.is_active);
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   const handleDeleteUser = async (userId: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
         await usersAPI.delete(userId);
         fetchUsers(); // Refresh the list
@@ -93,25 +67,19 @@ export default function UsersPage() {
     }
   };
 
-  const getRoleName = (roleId: string) => {
-    const role = roles.find(r => r.id === roleId);
-    return role ? role.name : 'Unknown Role';
-  };
-
   const getStatusBadge = (isActive: boolean) => {
-    return isActive ? (
-      <Badge className="bg-green-100 text-green-800">Active</Badge>
-    ) : (
-      <Badge className="bg-red-100 text-red-800">Inactive</Badge>
-    );
+    if (isActive) {
+      return <Badge variant="default">Active</Badge>;
+    }
+    return <Badge variant="destructive">Inactive</Badge>;
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading users...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4">Loading users...</p>
         </div>
       </div>
     );
@@ -120,176 +88,216 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-        <p className="text-gray-600 mt-2">
-          Manage system users and their access permissions
+        <h1 className="text-3xl font-bold">User Management</h1>
+        <p className="mt-2">
+          Manage system users, their roles, and access permissions.
         </p>
       </div>
 
-      {/* Create New User */}
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{users.length}</div>
+            <p className="text-xs text-muted-foreground">
+              Registered users
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.is_active).length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Currently active
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Admins</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.role === 'admin').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Administrator accounts
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">New This Month</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {users.filter(u => {
+                const created = new Date(u.created_at);
+                const now = new Date();
+                return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+              }).length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Users created this month
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Controls */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="h-5 w-5 mr-2" />
-            Create New User
-          </CardTitle>
+          <CardTitle>User Controls</CardTitle>
           <CardDescription>
-            Add a new user to the system
+            Search, filter, and manage users
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!isCreatingUser ? (
-            <Button onClick={() => setIsCreatingUser(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              New User
-            </Button>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="user@example.com"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="role">Role</Label>
-                  <select
-                    id="role"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={newUser.role_id}
-                    onChange={(e) => setNewUser({ ...newUser, role_id: e.target.value })}
-                  >
-                    <option value="">Select a role</option>
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="first_name">First Name</Label>
-                  <Input
-                    id="first_name"
-                    placeholder="John"
-                    value={newUser.first_name}
-                    onChange={(e) => setNewUser({ ...newUser, first_name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="last_name">Last Name</Label>
-                  <Input
-                    id="last_name"
-                    placeholder="Doe"
-                    value={newUser.last_name}
-                    onChange={(e) => setNewUser({ ...newUser, last_name: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="search">Search Users</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                 <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  id="search"
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
                 />
               </div>
-              <div className="flex space-x-2">
-                <Button onClick={handleCreateUser}>Create User</Button>
-                <Button variant="outline" onClick={() => setIsCreatingUser(false)}>
-                  Cancel
-                </Button>
-              </div>
             </div>
-          )}
+            
+            <div>
+              <Label htmlFor="role-filter">Filter by Role</Label>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All roles" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All roles</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="status-filter">Filter by Status</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-end">
+              <Button className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Users List */}
+      {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle>System Users</CardTitle>
+          <CardTitle>Users</CardTitle>
           <CardDescription>
-            All registered users in the system
+            {filteredUsers.length} of {users.length} users
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full">
+              <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+              <tbody className="divide-y divide-border">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-accent/5">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <Users className="h-6 w-6 text-blue-600" />
-                          </div>
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center">
+                          <Users className="h-6 w-6" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.first_name} {user.last_name}
+                          <div className="text-sm font-medium">
+                            {user.first_name && user.last_name 
+                              ? `${user.first_name} ${user.last_name}`
+                              : 'Unnamed User'
+                            }
                           </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <Mail className="h-4 w-4 mr-1" />
+                          <div className="text-sm flex items-center">
+                            <Mail className="h-3 w-3 mr-1" />
                             {user.email}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="outline">{getRoleName(user.role_id)}</Badge>
+                      <Badge variant="outline" className="capitalize">
+                        {user.role}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(user.is_active)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {new Date(user.created_at).toLocaleDateString()}
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {new Date(user.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4 mr-1" />
+                          <Edit className="h-3 w-3 mr-1" />
                           Edit
                         </Button>
                         <Button 
                           variant="outline" 
-                          size="sm" 
-                          className="text-red-600 hover:text-red-700"
+                          size="sm"
                           onClick={() => handleDeleteUser(user.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Delete
                         </Button>
                       </div>
                     </td>
@@ -297,6 +305,11 @@ export default function UsersPage() {
                 ))}
               </tbody>
             </table>
+            {filteredUsers.length === 0 && (
+              <div className="text-center py-8">
+                No users found matching your criteria.
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
