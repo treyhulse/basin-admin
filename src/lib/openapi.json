@@ -110,10 +110,220 @@
         }
       }
     },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign Up",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "description": "Sign up payload",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.SignUpRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.SignUpResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/{id}": {
+      "put": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Update User",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update payload",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Delete User",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.DeleteUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/items/api-keys": {
       "get": {
         "tags": [
-          "core-api-keys"
+          "api-keys"
         ],
         "summary": "List API keys",
         "security": [
@@ -243,7 +453,7 @@
       },
       "post": {
         "tags": [
-          "core-api-keys"
+          "api-keys"
         ],
         "summary": "Create API key",
         "security": [
@@ -314,7 +524,7 @@
     "/items/api-keys/{id}": {
       "get": {
         "tags": [
-          "core-api-keys"
+          "api-keys"
         ],
         "summary": "Get API key",
         "security": [
@@ -391,7 +601,7 @@
       },
       "put": {
         "tags": [
-          "core-api-keys"
+          "api-keys"
         ],
         "summary": "Update API key",
         "security": [
@@ -480,7 +690,7 @@
       },
       "delete": {
         "tags": [
-          "core-api-keys"
+          "api-keys"
         ],
         "summary": "Delete API key",
         "security": [
@@ -559,7 +769,7 @@
     "/items/collections": {
       "get": {
         "tags": [
-          "core-collections"
+          "collections"
         ],
         "summary": "List collections",
         "security": [
@@ -698,7 +908,7 @@
       },
       "post": {
         "tags": [
-          "core-collections"
+          "collections"
         ],
         "summary": "Create collection",
         "security": [
@@ -769,7 +979,7 @@
     "/items/collections/{id}": {
       "get": {
         "tags": [
-          "core-collections"
+          "collections"
         ],
         "summary": "Get collection",
         "security": [
@@ -846,7 +1056,7 @@
       },
       "put": {
         "tags": [
-          "core-collections"
+          "collections"
         ],
         "summary": "Update collection",
         "security": [
@@ -935,7 +1145,7 @@
       },
       "delete": {
         "tags": [
-          "core-collections"
+          "collections"
         ],
         "summary": "Delete collection",
         "security": [
@@ -1014,7 +1224,7 @@
     "/items/fields": {
       "get": {
         "tags": [
-          "core-fields"
+          "fields"
         ],
         "summary": "List fields",
         "security": [
@@ -1162,7 +1372,7 @@
       },
       "post": {
         "tags": [
-          "core-fields"
+          "fields"
         ],
         "summary": "Create field",
         "security": [
@@ -1233,7 +1443,7 @@
     "/items/fields/{id}": {
       "get": {
         "tags": [
-          "core-fields"
+          "fields"
         ],
         "summary": "Get field",
         "security": [
@@ -1310,7 +1520,7 @@
       },
       "put": {
         "tags": [
-          "core-fields"
+          "fields"
         ],
         "summary": "Update field",
         "security": [
@@ -1399,7 +1609,7 @@
       },
       "delete": {
         "tags": [
-          "core-fields"
+          "fields"
         ],
         "summary": "Delete field",
         "security": [
@@ -1478,7 +1688,7 @@
     "/items/permissions": {
       "get": {
         "tags": [
-          "core-permissions"
+          "permissions"
         ],
         "summary": "List permissions",
         "security": [
@@ -1617,7 +1827,7 @@
       },
       "post": {
         "tags": [
-          "core-permissions"
+          "permissions"
         ],
         "summary": "Create permission",
         "security": [
@@ -1688,7 +1898,7 @@
     "/items/permissions/{id}": {
       "get": {
         "tags": [
-          "core-permissions"
+          "permissions"
         ],
         "summary": "Get permission",
         "security": [
@@ -1765,7 +1975,7 @@
       },
       "put": {
         "tags": [
-          "core-permissions"
+          "permissions"
         ],
         "summary": "Update permission",
         "security": [
@@ -1854,7 +2064,7 @@
       },
       "delete": {
         "tags": [
-          "core-permissions"
+          "permissions"
         ],
         "summary": "Delete permission",
         "security": [
@@ -1933,7 +2143,7 @@
     "/items/roles": {
       "get": {
         "tags": [
-          "core-roles"
+          "roles"
         ],
         "summary": "List roles",
         "security": [
@@ -2054,7 +2264,7 @@
       },
       "post": {
         "tags": [
-          "core-roles"
+          "roles"
         ],
         "summary": "Create role",
         "security": [
@@ -2125,7 +2335,7 @@
     "/items/roles/{id}": {
       "get": {
         "tags": [
-          "core-roles"
+          "roles"
         ],
         "summary": "Get role",
         "security": [
@@ -2202,7 +2412,7 @@
       },
       "put": {
         "tags": [
-          "core-roles"
+          "roles"
         ],
         "summary": "Update role",
         "security": [
@@ -2291,7 +2501,7 @@
       },
       "delete": {
         "tags": [
-          "core-roles"
+          "roles"
         ],
         "summary": "Delete role",
         "security": [
@@ -2370,7 +2580,7 @@
     "/items/users": {
       "get": {
         "tags": [
-          "core-users"
+          "users"
         ],
         "summary": "List users",
         "security": [
@@ -2500,7 +2710,7 @@
       },
       "post": {
         "tags": [
-          "core-users"
+          "users"
         ],
         "summary": "Create user",
         "security": [
@@ -2571,7 +2781,7 @@
     "/items/users/{id}": {
       "get": {
         "tags": [
-          "core-users"
+          "users"
         ],
         "summary": "Get user",
         "security": [
@@ -2648,7 +2858,7 @@
       },
       "put": {
         "tags": [
-          "core-users"
+          "users"
         ],
         "summary": "Update user",
         "security": [
@@ -2737,7 +2947,7 @@
       },
       "delete": {
         "tags": [
-          "core-users"
+          "users"
         ],
         "summary": "Delete user",
         "security": [
@@ -3361,6 +3571,463 @@
           }
         }
       }
+    },
+    "/tenants": {
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Get All Tenants",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/models.Tenant"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Create Tenant",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "description": "Tenant creation payload",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.CreateTenantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.TenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{id}": {
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Get Tenant by ID",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.Tenant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Update Tenant",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update payload",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.UpdateTenantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.Tenant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Delete Tenant",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.DeleteTenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{id}/join": {
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Join Tenant (Current User)",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.UserTenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{id}/users": {
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Add User to Tenant",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Add user payload",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.AddUserToTenantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.UserTenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{id}/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Remove User from Tenant",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tenant ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.UserTenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3377,6 +4044,25 @@
       }
     },
     "schemas": {
+      "models.AddUserToTenantRequest": {
+        "type": "object",
+        "required": [
+          "role_id",
+          "tenant_id",
+          "user_id"
+        ],
+        "properties": {
+          "role_id": {
+            "type": "string"
+          },
+          "tenant_id": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
       "models.CreateItemMeta": {
         "type": "object",
         "properties": {
@@ -3402,6 +4088,24 @@
           }
         }
       },
+      "models.CreateTenantRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "slug"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        }
+      },
       "models.DeleteItemMeta": {
         "type": "object",
         "properties": {
@@ -3424,6 +4128,22 @@
         "properties": {
           "meta": {
             "$ref": "#/components/schemas/models.DeleteItemMeta"
+          }
+        }
+      },
+      "models.DeleteTenantResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "models.DeleteUserResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
           }
         }
       },
@@ -3525,17 +4245,103 @@
           },
           "password": {
             "type": "string"
+          },
+          "tenant_slug": {
+            "description": "Optional: specify tenant for login",
+            "type": "string"
           }
         }
       },
       "models.LoginResponse": {
         "type": "object",
         "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "tenant_slug": {
+            "type": "string"
+          },
           "token": {
             "type": "string"
           },
           "user": {
             "$ref": "#/components/schemas/models.User"
+          }
+        }
+      },
+      "models.SignUpRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "first_name",
+          "last_name",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "tenant_slug": {
+            "description": "Optional: create/join tenant during signup",
+            "type": "string"
+          }
+        }
+      },
+      "models.SignUpResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/models.User"
+          }
+        }
+      },
+      "models.Tenant": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "models.TenantResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "tenant": {
+            "$ref": "#/components/schemas/models.Tenant"
           }
         }
       },
@@ -3564,6 +4370,37 @@
           }
         }
       },
+      "models.UpdateTenantRequest": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        }
+      },
+      "models.UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "last_name": {
+            "type": "string"
+          }
+        }
+      },
       "models.User": {
         "type": "object",
         "properties": {
@@ -3586,6 +4423,14 @@
             "type": "string"
           },
           "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "models.UserTenantResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
             "type": "string"
           }
         }

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { getAuthToken, removeAuthToken } from './auth';
+import { AuthResponse, AuthContextResponse, SignUpRequest } from './auth';
 
 export const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
@@ -34,12 +35,28 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+  login: async (email: string, password: string, tenant_slug?: string): Promise<AuthResponse> => {
+    const response = await api.post('/auth/login', { email, password, tenant_slug });
+    return response.data;
+  },
+  signup: async (userData: SignUpRequest): Promise<AuthResponse> => {
+    const response = await api.post('/auth/signup', userData);
     return response.data;
   },
   getCurrentUser: async () => {
     const response = await api.get('/auth/me');
+    return response.data;
+  },
+  getAuthContext: async (): Promise<AuthContextResponse> => {
+    const response = await api.get('/auth/context');
+    return response.data;
+  },
+  switchTenant: async (tenant_id: string): Promise<AuthResponse> => {
+    const response = await api.post('/auth/switch-tenant', { tenant_id });
+    return response.data;
+  },
+  getUserTenants: async () => {
+    const response = await api.get('/auth/tenants');
     return response.data;
   },
 };
@@ -276,6 +293,55 @@ export const apiKeysAPI = {
   },
   delete: async (id: string) => {
     const response = await api.delete(`/items/api-keys/${id}`);
+    return response.data;
+  },
+};
+
+// Tenants API
+export const tenantsAPI = {
+  list: async () => {
+    const response = await api.get('/tenants');
+    return response.data;
+  },
+  get: async (id: string) => {
+    const response = await api.get(`/tenants/${id}`);
+    return response.data;
+  },
+  create: async (tenantData: {
+    name: string;
+    slug: string;
+    domain?: string;
+  }) => {
+    const response = await api.post('/tenants', tenantData);
+    return response.data;
+  },
+  update: async (id: string, tenantData: {
+    name?: string;
+    slug?: string;
+    domain?: string;
+    is_active?: boolean;
+  }) => {
+    const response = await api.put(`/tenants/${id}`, tenantData);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/tenants/${id}`);
+    return response.data;
+  },
+  join: async (id: string) => {
+    const response = await api.post(`/tenants/${id}/join`);
+    return response.data;
+  },
+  addUser: async (id: string, userData: {
+    user_id: string;
+    role_id: string;
+    tenant_id: string;
+  }) => {
+    const response = await api.post(`/tenants/${id}/users`, userData);
+    return response.data;
+  },
+  removeUser: async (id: string, userId: string) => {
+    const response = await api.delete(`/tenants/${id}/users/${userId}`);
     return response.data;
   },
 };

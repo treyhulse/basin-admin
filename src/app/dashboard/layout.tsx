@@ -3,7 +3,7 @@
 import { useAuth } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, User, Database, Settings, Users, Key, Table, Kanban, Calendar, Grid3X3 } from 'lucide-react';
+import { LogOut, User, Database, Settings, Users, Key, Table, Kanban, Calendar, Grid3X3, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ProtectedRoute from '@/components/auth/protected-route';
@@ -13,6 +13,14 @@ interface DashboardLayoutProps {
 }
 
 const navigation = [
+  // Organization
+  { 
+    name: 'Organization', 
+    href: '/dashboard/organization', 
+    icon: Building2,
+    description: 'Manage organization settings'
+  },
+  
   // Data Management
   { 
     name: 'Collections', 
@@ -57,7 +65,7 @@ const navigation = [
 ];
 
 function DashboardLayoutContent({ children }: DashboardLayoutProps) {
-  const { user, logout } = useAuth();
+  const { user, tenant, logout } = useAuth();
   const pathname = usePathname();
 
   return (
@@ -66,8 +74,18 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
               <h1 className="text-xl font-semibold text-gray-900">Basin Admin</h1>
+              {tenant && (
+                <Link href="/dashboard/organization">
+                  <div className="flex items-center space-x-2 hover:bg-gray-50 px-2 py-1 rounded-md transition-colors cursor-pointer">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600 font-medium">
+                      {tenant.name}
+                    </span>
+                  </div>
+                </Link>
+              )}
             </div>
             
             <div className="flex items-center space-x-4">
