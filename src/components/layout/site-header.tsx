@@ -45,6 +45,7 @@ export function SiteHeader() {
       if (segment === 'api-keys') title = 'API Keys'
       if (segment === 'data-views') title = 'Data Views'
       if (segment === 'roles') title = 'Roles & Permissions'
+      if (segment === 'mcp') title = 'MCP'
       
       breadcrumbs.push({
         title,
