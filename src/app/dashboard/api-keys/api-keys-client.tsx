@@ -148,7 +148,7 @@ export default function ApiKeysClient() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading API keys...</p>
+          <p className="mt-4">Loading API keys...</p>
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ export default function ApiKeysClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">API Keys</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold">API Keys</h1>
+        <p className="mt-2">
           Manage API keys for external integrations and applications
         </p>
       </div>
@@ -270,10 +270,10 @@ export default function ApiKeysClient() {
                       <div className="flex items-center space-x-3">
                         <Key className="h-5 w-5 text-blue-600" />
                         <div>
-                          <h3 className="font-medium text-gray-900">{apiKey.name}</h3>
+                          <h3 className="font-medium">{apiKey.name}</h3>
                           <div className="flex items-center space-x-2 mt-1">
                             {getStatusBadge(apiKey.status)}
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm">
                               Created {new Date(apiKey.created_at).toLocaleDateString()}
                             </span>
                           </div>
@@ -314,9 +314,9 @@ export default function ApiKeysClient() {
 
                     {/* API Key Display */}
                     {showKeys[apiKey.id] && (
-                      <div className="bg-gray-50 p-3 rounded border mb-3">
+                      <div className="p-3 rounded border mb-3">
                         <div className="flex items-center justify-between">
-                          <code className="text-sm font-mono text-gray-800">
+                          <code className="text-sm font-mono">
                             {apiKey.key}
                           </code>
                         </div>
@@ -326,18 +326,18 @@ export default function ApiKeysClient() {
                     {/* Key Details */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">User:</span>
+                        <span>User:</span>
                         <div className="mt-1">
                           <div className="font-medium">{getUserName(apiKey.user_id)}</div>
-                          <div className="text-gray-600">{getUserEmail(apiKey.user_id)}</div>
+                          <div>{getUserEmail(apiKey.user_id)}</div>
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Permissions:</span>
+                        <span>Permissions:</span>
                         <div className="mt-1">{formatPermissions(apiKey.permissions)}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Last Used:</span>
+                        <span>Last Used:</span>
                         <div className="mt-1 flex items-center">
                           <Calendar className="h-4 w-4 mr-1" />
                           {apiKey.last_used ? new Date(apiKey.last_used).toLocaleDateString() : 'Never'}
@@ -347,7 +347,7 @@ export default function ApiKeysClient() {
                   </div>
                 ))}
                 {apiKeys.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8">
                     No API keys found. Create your first API key above.
                   </div>
                 )}

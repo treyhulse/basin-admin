@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/layout/theme-toggle"
+import { AuthSection } from "@/components/layout/auth-section"
 
 export function Navbar() {
   return (
@@ -43,18 +42,8 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Right side - Auth buttons and theme toggle */}
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            <div className="hidden sm:flex items-center space-x-2">
-              <Button variant="ghost" asChild>
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/login">Get Started</Link>
-              </Button>
-            </div>
-          </div>
+          {/* Right side - Dynamic auth section */}
+          <AuthSection />
         </div>
       </div>
     </nav>

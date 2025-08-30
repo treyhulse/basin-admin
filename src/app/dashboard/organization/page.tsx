@@ -166,7 +166,7 @@ export default function OrganizationPage() {
                   ))}
                 </div>
               </div>
-              <div>
+              <div className="overflow-x-auto bg-background p-3 rounded-md">
                 <label className="text-sm font-medium">Raw Auth Object</label>
                 <pre className="text-xs p-3 rounded-md overflow-x-auto">
                   {JSON.stringify(auth, null, 2)}

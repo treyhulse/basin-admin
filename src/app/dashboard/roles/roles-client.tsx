@@ -161,7 +161,7 @@ export default function RolesClient() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {roles.reduce((total, role) => total + role.user_count, 0)}
+              {roles.reduce((total, role) => total + (role.user_count || 0), 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Users with roles assigned
@@ -264,7 +264,7 @@ export default function RolesClient() {
                 <div className="mt-2 flex items-center space-x-4 text-sm">
                   <span className="flex items-center">
                     <Users className="h-3 w-3 mr-1" />
-                    {role.user_count} users
+                    {role.user_count || 0} users
                   </span>
                   <span>
                     Created {new Date(role.created_at).toLocaleDateString()}
@@ -274,7 +274,7 @@ export default function RolesClient() {
                 <div className="mt-3">
                   <span className="text-xs font-medium">Permissions:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {role.permissions.slice(0, 3).map((permissionId) => {
+                    {(role.permissions || []).slice(0, 3).map((permissionId) => {
                       const permission = permissions.find(p => p.id === permissionId);
                       return permission ? (
                         <Badge key={permission.id} variant="outline" className="text-xs">
@@ -282,9 +282,9 @@ export default function RolesClient() {
                         </Badge>
                       ) : null;
                     })}
-                    {role.permissions.length > 3 && (
+                    {(role.permissions || []).length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{role.permissions.length - 3} more
+                        +{(role.permissions || []).length - 3} more
                       </Badge>
                     )}
                   </div>

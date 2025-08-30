@@ -23,7 +23,7 @@
   --color-destructive-foreground: #ffffff;
   --color-border: #3d4354;
   --color-input: #3d4354;
-  --color-ring: #e05d38;
+  --color-ring: #007595;
   --color-chart-1: #86a7c8;
   --color-chart-2: #e6a08f;
   --color-chart-3: #5a7ca6;
@@ -31,12 +31,12 @@
   --color-chart-5: #334c82;
   --color-sidebar: #2a303f;
   --color-sidebar-foreground: #e5e5e5;
-  --color-sidebar-primary: #e05d38;
+  --color-sidebar-primary: #007595;
   --color-sidebar-primary-foreground: #ffffff;
   --color-sidebar-accent: #2a3656;
   --color-sidebar-accent-foreground: #bfdbfe;
   --color-sidebar-border: #3d4354;
-  --color-sidebar-ring: #e05d38;
+  --color-sidebar-ring: #007595;
   --color-sidebar-muted: #2a303e;
   --color-sidebar-muted-foreground: #a3a3a3;
 
@@ -82,7 +82,7 @@
   --color-destructive-foreground: #ffffff;
   --color-border: #dcdfe2;
   --color-input: #f4f5f7;
-  --color-ring: #e05d38;
+  --color-ring: #007595;
   --color-chart-1: #86a7c8;
   --color-chart-2: #eea591;
   --color-chart-3: #5a7ca6;
@@ -90,12 +90,12 @@
   --color-chart-5: #334c82;
   --color-sidebar: #dddfe2;
   --color-sidebar-foreground: #333333;
-  --color-sidebar-primary: #e05d38;
+  --color-sidebar-primary: #007595;
   --color-sidebar-primary-foreground: #ffffff;
   --color-sidebar-accent: #d6e4f0;
   --color-sidebar-accent-foreground: #1e3a8a;
   --color-sidebar-border: #e5e7eb;
-  --color-sidebar-ring: #e05d38;
+  --color-sidebar-ring: #007595;
   --color-sidebar-muted: #f3f4f6;
   --color-sidebar-muted-foreground: #6b7280;
 

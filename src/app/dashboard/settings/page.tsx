@@ -8,8 +8,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="mt-2">
           Configure your system settings and preferences
         </p>
       </div>
@@ -19,7 +19,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Database className="h-5 w-5 text-blue-600" />
+              <Database className="h-5 w-5" />
               <span>API Configuration</span>
             </CardTitle>
             <CardDescription>
@@ -55,7 +55,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-green-600" />
+              <Shield className="h-5 w-5" />
               <span>Security Settings</span>
             </CardTitle>
             <CardDescription>
@@ -92,7 +92,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Settings className="h-5 w-5 text-purple-600" />
+              <Settings className="h-5 w-5" />
               <span>General Settings</span>
             </CardTitle>
             <CardDescription>
@@ -136,7 +136,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Database className="h-5 w-5 text-orange-600" />
+              <Database className="h-5 w-5" />
               <span>Database Settings</span>
             </CardTitle>
             <CardDescription>
@@ -181,7 +181,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Globe className="h-5 w-5 text-gray-600" />
+            <Globe className="h-5 w-5" />
             <span>System Information</span>
           </CardTitle>
           <CardDescription>
@@ -191,16 +191,16 @@ export default function SettingsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label className="text-sm font-medium text-gray-500">Version</Label>
-              <p className="text-sm text-gray-900">1.0.0</p>
+              <Label className="text-sm font-medium">Version</Label>
+              <p className="text-sm">1.0.0</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-500">Environment</Label>
-              <p className="text-sm text-gray-900">Development</p>
+              <Label className="text-sm font-medium">Environment</Label>
+              <p className="text-sm">Development</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-500">Last Updated</Label>
-              <p className="text-sm text-gray-900">2024-01-30</p>
+              <Label className="text-sm font-medium">Last Updated</Label>
+              <p className="text-sm">2024-01-30</p>
             </div>
           </div>
         </CardContent>
