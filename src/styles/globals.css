@@ -1,6 +1,68 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* Ensure dark theme is applied when .dark class is present */
+.dark {
+  --color-background: #1c2433;
+  --color-foreground: #e5e5e5;
+  --color-card: #2a3040;
+  --color-card-foreground: #e5e5e5;
+  --color-popover: #262b38;
+  --color-popover-foreground: #e5e5e5;
+  --color-primary: #007595;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #2a303e;
+  --color-secondary-foreground: #e5e5e5;
+  --color-muted: #2a303e;
+  --color-muted-foreground: #a3a3a3;
+  --color-accent: #2a3656;
+  --color-accent-foreground: #bfdbfe;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #3d4354;
+  --color-input: #3d4354;
+  --color-ring: #e05d38;
+  --color-chart-1: #86a7c8;
+  --color-chart-2: #e6a08f;
+  --color-chart-3: #5a7ca6;
+  --color-chart-4: #466494;
+  --color-chart-5: #334c82;
+  --color-sidebar: #2a303f;
+  --color-sidebar-foreground: #e5e5e5;
+  --color-sidebar-primary: #e05d38;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #2a3656;
+  --color-sidebar-accent-foreground: #bfdbfe;
+  --color-sidebar-border: #3d4354;
+  --color-sidebar-ring: #e05d38;
+  --color-sidebar-muted: #2a303e;
+  --color-sidebar-muted-foreground: #a3a3a3;
+
+  --font-sans: Inter, sans-serif;
+  --font-serif: "Source Serif 4", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 2px 4px -1px hsl(0 0% 0% / 0.10);
+  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
+  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
+  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
 @theme {
   --color-background: #e8ebed;
   --color-foreground: #333333;
@@ -34,17 +96,19 @@
   --color-sidebar-accent-foreground: #1e3a8a;
   --color-sidebar-border: #e5e7eb;
   --color-sidebar-ring: #e05d38;
-  
+  --color-sidebar-muted: #f3f4f6;
+  --color-sidebar-muted-foreground: #6b7280;
+
   --font-sans: Inter, sans-serif;
   --font-serif: "Source Serif 4", serif;
   --font-mono: "JetBrains Mono", monospace;
-  
+
   --radius: 0.75rem;
   --radius-sm: 0.5rem;
   --radius-md: 0.625rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
-  
+
   --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -53,67 +117,12 @@
   --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
   --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
   --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
-  
+
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
 
-@theme dark {
-  --color-background: #1c2433;
-  --color-foreground: #e5e5e5;
-  --color-card: #2a3040;
-  --color-card-foreground: #e5e5e5;
-  --color-popover: #262b38;
-  --color-popover-foreground: #e5e5e5;
-  --color-primary: #007595;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #2a303e;
-  --color-secondary-foreground: #e5e5e5;
-  --color-muted: #2a303e;
-  --color-muted-foreground: #a3a3a3;
-  --color-accent: #2a3656;
-  --color-accent-foreground: #bfdbfe;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
-  --color-border: #3d4354;
-  --color-input: #3d4354;
-  --color-ring: #e05d38;
-  --color-chart-1: #86a7c8;
-  --color-chart-2: #e6a08f;
-  --color-chart-3: #5a7ca6;
-  --color-chart-4: #466494;
-  --color-chart-5: #334c82;
-  --color-sidebar: #2a303f;
-  --color-sidebar-foreground: #e5e5e5;
-  --color-sidebar-primary: #e05d38;
-  --color-sidebar-primary-foreground: #ffffff;
-  --color-sidebar-accent: #2a3656;
-  --color-sidebar-accent-foreground: #bfdbfe;
-  --color-sidebar-border: #3d4354;
-  --color-sidebar-ring: #e05d38;
-  
-  --font-sans: Inter, sans-serif;
-  --font-serif: "Source Serif 4", serif;
-  --font-mono: "JetBrains Mono", monospace;
-  
-  --radius: 0.75rem;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
-  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 2px 4px -1px hsl(0 0% 0% / 0.10);
-  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
-  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.10), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
-  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
-  
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-}
+
 
 @layer base {
   * {
@@ -123,3 +132,5 @@
     @apply bg-background text-foreground;
   }
 }
+
+
