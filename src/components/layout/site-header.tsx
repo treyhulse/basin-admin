@@ -13,6 +13,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
+import { TeamSwitcher } from "@/components/layout/team-switcher"
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -89,6 +90,7 @@ export function SiteHeader() {
       
       {/* Right side of header - can be used for user actions, notifications, etc. */}
       <div className="flex items-center gap-2">
+        <TeamSwitcher />
         <ThemeToggle />
         {/* Add any additional header actions here */}
       </div>

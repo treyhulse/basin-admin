@@ -2,16 +2,17 @@
 
 import * as React from "react"
 import {
+  Bot,
+  Brain,
+  Cpu,
   Database,
-  Frame,
-  Map,
-  PieChart,
   Settings2,
   Users,
+  Wrench,
 } from "lucide-react"
 
 import { NavMain } from "@/components/layout/nav-main"
-import { NavProjects } from "@/components/layout/nav-projects"
+import { NavMCP } from "@/components/layout/nav-mcp"
 import { NavUser } from "@/components/layout/nav-user"
 import { TeamSwitcher } from "@/components/layout/team-switcher"
 import {
@@ -21,6 +22,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { GitHubStarsWidget } from "@/components/layout/github-stars-widget"
+import Image from "next/image"
 
 // Navigation data for the sidebar
 const data = {
@@ -80,21 +83,40 @@ const data = {
       ],
     },
   ],
-  projects: [
+  mcpTools: [
     {
-      name: "Production",
-      url: "/dashboard",
-      icon: Frame,
+      name: "MCP Server",
+      url: "/dashboard/mcp/server",
+      icon: Cpu,
     },
     {
-      name: "Development",
-      url: "/dashboard",
-      icon: PieChart,
+      name: "Models",
+      url: "/dashboard/mcp/models",
+      icon: Brain,
+      items: [
+        {
+          title: "GPT-4",
+          url: "/dashboard/mcp/models",
+        },
+        {
+          title: "Claude",
+          url: "/dashboard/mcp/models",
+        },
+        {
+          title: "Gemini",
+          url: "/dashboard/mcp/models",
+        },
+      ],
     },
     {
-      name: "Staging",
-      url: "/dashboard",
-      icon: Map,
+      name: "Tools",
+      url: "/dashboard/mcp/tools",
+      icon: Wrench,
+    },
+    {
+      name: "Agents",
+      url: "/dashboard/mcp/agents",
+      icon: Bot,
     },
   ],
 }
@@ -103,11 +125,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher />
+        <div className="flex items-center justify-between w-full">
+          <Image
+            src="/logos/basin-logo.svg"
+            alt="Basin"
+            width={36}
+            height={36}
+            className="shrink-0"
+          />
+          <GitHubStarsWidget owner="treyhulse" repo="basin-admin" />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMCP mcpTools={data.mcpTools} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

@@ -14,7 +14,7 @@ export function Navbar() {
               <img 
                 src="/logos/basin-logo.svg" 
                 alt="Basin Logo" 
-                className="h-20 w-20"
+                className="h-10 w-10"
               />
               <span className="text-xl font-bold text-foreground">Basin</span>
             </Link>
