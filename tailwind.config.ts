@@ -8,7 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // You can add custom theme extensions here if needed
+      backgroundImage: {
+        'radial-gradient': 'radial-gradient(var(--tw-gradient-stops))',
+      },
     },
   },
   plugins: [],

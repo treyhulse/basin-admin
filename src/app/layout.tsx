@@ -8,8 +8,8 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 const inter = Outfit({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
 export const metadata: Metadata = {
-  title: "Basin Admin",
-  description: "Admin interface for Basin API",
+  title: "Basin",
+  description: "Comprehensive admin interface for Basin API, Data Management, MCP Servers, and more.",
 };
 
 export default function RootLayout({

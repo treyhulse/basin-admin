@@ -131,6 +131,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Text selection/highlighting using accent color */
+  ::selection {
+    background-color: #007595;
+    color: #ffffff;
+  }
+  
+  ::-moz-selection {
+    background-color: #007595;
+    color: #ffffff;
+  }
 }
 
 

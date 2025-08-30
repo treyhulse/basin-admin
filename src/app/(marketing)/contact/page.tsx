@@ -1,5 +1,3 @@
-import { Navbar } from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,8 +7,7 @@ import { Mail, MessageSquare, Phone } from "lucide-react"
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
       <main className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -125,7 +122,6 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+    </>
   )
 }

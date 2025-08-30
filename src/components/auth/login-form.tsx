@@ -83,14 +83,14 @@ export function LoginForm({
                           <div className="flex items-center space-x-2">
                             <span>{tenant.name}</span>
                             {tenant.domain && (
-                              <span className="text-xs text-gray-500">({tenant.domain})</span>
+                              <span className="text-xs">({tenant.domain})</span>
                             )}
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs">
                     {isSignUp 
                       ? 'Select the organization you want to join, or leave empty to create a new one'
                       : 'Select the organization you want to access'
@@ -191,7 +191,7 @@ export function LoginForm({
                 <button
                   type="button"
                   onClick={onToggleMode}
-                  className="text-blue-600 hover:text-blue-700 underline underline-offset-4"
+                  className="underline underline-offset-4"
                 >
                   {isSignUp ? 'Sign in' : 'Sign up'}
                 </button>

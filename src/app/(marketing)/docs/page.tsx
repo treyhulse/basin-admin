@@ -1,5 +1,3 @@
-import { Navbar } from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
@@ -123,8 +121,7 @@ const resources = [
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <>
       <main className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -296,7 +293,6 @@ export default function DocsPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+    </>
   )
 }
