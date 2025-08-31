@@ -102,7 +102,7 @@ export function LoginForm({
 
               {isSignUp && (
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
+                  <div className="grid gap-3">
                     <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
@@ -114,7 +114,7 @@ export function LoginForm({
                       disabled={isLoading}
                     />
                   </div>
-                  <div>
+                  <div className="grid gap-3">
                     <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"

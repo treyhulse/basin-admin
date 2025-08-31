@@ -119,8 +119,8 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <div className="max-w-4xl w-full">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl">
         <LoginForm
           email={email}
           password={password}
@@ -143,6 +143,6 @@ export default function LoginPage() {
           onToggleMode={handleToggleMode}
         />
       </div>
-    </>
+    </div>
   );
 }
