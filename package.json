@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "update-api": "node scripts/update-api.js",
-    "generate-types": "openapi-typescript ./src/lib/openapi.json -o ./src/lib/api-types.ts"
+    "generate-types": "openapi-typescript ./src/lib/openapi.json -o ./src/lib/api-types.ts",
+    "mcp:dev": "tsx mcp/basin.ts",
+    "mcp:build": "tsc -p . && node dist/mcp/basin.js",
+    "mcp:inspect": "npx @modelcontextprotocol/inspector"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -42,6 +45,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -51,6 +55,7 @@
     "openapi-typescript": "^7.8.0",
     "swagger-typescript-api": "^13.2.7",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
   }

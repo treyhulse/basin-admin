@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+      "basin-mcp": {
+        "command": "npm",
+        "args": ["run", "mcp:dev"],
+        "env": {}
+      }
+    }
+  }
+  
