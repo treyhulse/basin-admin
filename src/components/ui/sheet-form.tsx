@@ -100,11 +100,17 @@ export function SheetForm<T extends FieldValues>({
 
   // Handle form submission
   const handleSubmit = async (data: T) => {
-    if (!onSubmit) return
+    console.log('SheetForm: handleSubmit called with data:', data)
+    if (!onSubmit) {
+      console.log('SheetForm: No onSubmit handler provided')
+      return
+    }
     
     try {
+      console.log('SheetForm: Calling onSubmit handler...')
       setIsSubmitting(true)
       await onSubmit(data)
+      console.log('SheetForm: onSubmit completed successfully')
       onOpenChange(false)
       form.reset()
     } catch (error) {
@@ -113,6 +119,13 @@ export function SheetForm<T extends FieldValues>({
       setIsSubmitting(false)
     }
   }
+
+  // Reset form when mode changes
+  React.useEffect(() => {
+    if (open && mode === 'create') {
+      form.reset(defaultValues as any)
+    }
+  }, [open, mode, defaultValues, form])
 
   // Handle delete action
   const handleDelete = async () => {
@@ -183,8 +196,11 @@ export function SheetForm<T extends FieldValues>({
             // Form view
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
-                {fields}
-                {children}
+                <div className="space-y-4">
+                  {fields}
+                  {children}
+                </div>
+
               </form>
             </Form>
           )}
@@ -213,20 +229,24 @@ export function SheetForm<T extends FieldValues>({
                   )}
                   {config.submitText}
                 </Button>
-              ) : mode !== "view" ? (
-                <Button
-                  type="submit"
-                  variant={config.submitVariant}
-                  disabled={isFormDisabled}
-                  className="min-w-[100px]"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  {config.submitText}
-                </Button>
+                             ) : mode !== "view" ? (
+                 <Button
+                   type="submit"
+                   variant={config.submitVariant}
+                   disabled={isFormDisabled}
+                   className="min-w-[100px]"
+                                       onClick={() => {
+                      // Manually trigger form submission to ensure it works
+                      form.handleSubmit(handleSubmit)()
+                    }}
+                 >
+                   {isSubmitting ? (
+                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                   ) : (
+                     <Save className="h-4 w-4 mr-2" />
+                   )}
+                   {config.submitText}
+                 </Button>
               ) : (
                 <Button
                   type="button"

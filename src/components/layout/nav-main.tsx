@@ -53,21 +53,16 @@ export function NavMain({
         setError(null)
         
         console.log('Fetching collections from API...')
-        // Temporarily disabled to debug API request issue
-        // const response = await collectionsAPI.list({ limit: 100 })
-        // console.log('Collections API response:', response)
+        const response = await collectionsAPI.list({ limit: 100 })
+        console.log('Collections API response:', response)
         
-        // if (response && response.data) {
-        //   setCollections(response.data)
-        //   console.log('Collections loaded:', response.data.length)
-        // } else {
-        //   console.log('No collections data in response')
-        //   setCollections([])
-        // }
-        
-        // For now, just set empty collections to avoid API calls
-        setCollections([])
-        console.log('Collections API call disabled for debugging')
+        if (response && response.data) {
+          setCollections(response.data)
+          console.log('Collections loaded:', response.data.length)
+        } else {
+          console.log('No collections data in response')
+          setCollections([])
+        }
         
       } catch (error) {
         console.error('Failed to fetch collections:', error)
@@ -96,8 +91,8 @@ export function NavMain({
   // Fallback items if no collections are loaded
   const fallbackItems = [
     {
-      title: "Sample Collection",
-      url: "/dashboard/data/sample"
+      title: "No Collections",
+      url: "#"
     }
   ]
 

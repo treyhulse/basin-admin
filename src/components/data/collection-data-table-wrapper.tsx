@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { CollectionDataTable, type DataColumn } from "./collection-data-table"
-import { itemsAPI } from "@/lib/api"
+import { CollectionService } from "@/lib/services/collection-service"
+import { 
+  generateCollectionSchema, 
+  generateFormFields,
+  generateFormFieldsFromSchema,
+  generateCollectionSchemaFromSchema,
+  generateColumnsFromSchema
+} from "@/lib/schemas/collection-schemas"
 
 // Collection metadata interface
 interface CollectionMetadata {
@@ -59,98 +66,121 @@ const getColumnWidth = (key: string, value: any): string => {
 }
 
 export function CollectionDataTableWrapper({ 
-  collectionName 
+  collectionName,
+  crudActions,
+  crudState
 }: { 
-  collectionName: string 
+  collectionName: string
+  crudActions?: any
+  crudState?: any
 }) {
   const [columns, setColumns] = useState<DataColumn[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [displayName, setDisplayName] = useState<string>("")
+  const [formFields, setFormFields] = useState<any[]>([])
+  const [formSchema, setFormSchema] = useState<any>(null)
 
-  // Single useEffect that runs only once - no dependencies
+  // Single useEffect that handles everything
   useEffect(() => {
-    console.log('CollectionDataTableWrapper: useEffect running for collection:', collectionName)
-    
-    if (!collectionName) {
-      console.error('No collection name provided')
-      return
-    }
-    
-    // Generate display name from collection name
-    const formattedName = collectionName
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-      .replace(/\b\w/g, l => l.toUpperCase()) // Ensure first letter of each word is capitalized
-    setDisplayName(formattedName)
-    
-    // Fetch schema only once
-    const fetchSchema = async () => {
-      console.log('CollectionDataTableWrapper: Fetching schema for collection:', collectionName)
+    if (!collectionName) return
+
+    const initializeCollection = async () => {
       try {
         setIsLoading(true)
-        const response = await itemsAPI.list(collectionName.toLowerCase(), { limit: 1 })
+        
+        // Generate display name
+        const formattedName = collectionName
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          .replace(/\b\w/g, l => l.toUpperCase())
+        setDisplayName(formattedName)
+
+        // Initialize service and fetch data
+        const service = new CollectionService({ collectionName })
+        const response = await service.list({ limit: 1 })
         const data = response.data || []
         
+        let generatedColumns: DataColumn[]
         if (data.length > 0) {
-          const generatedColumns = generateColumnsFromData(data)
-          setColumns(generatedColumns)
+          generatedColumns = generateColumnsFromData(data)
         } else {
-          // If no data, create basic columns
-          setColumns([
+          // Fallback columns
+          generatedColumns = [
             { key: 'id', label: 'ID', width: '80px', sortable: true, filterable: true },
             { key: 'name', label: 'Name', width: 'auto', sortable: true, filterable: true },
             { key: 'created_at', label: 'Created', width: '140px', sortable: true, filterable: true }
-          ])
+          ]
         }
+        
+        setColumns(generatedColumns)
+        
+        // Generate form configuration using schema if available
+        let fields, schema, finalColumns
+        
+        try {
+          // Try to get schema from the service
+          const schemaResponse = await service.getSchema()
+          if (schemaResponse.success && schemaResponse.data) {
+            console.log('CollectionDataTableWrapper: Using schema-based field generation')
+            
+            // Generate columns from the actual schema instead of data
+            const schemaColumns = generateColumnsFromSchema(schemaResponse.data)
+            console.log('CollectionDataTableWrapper: Schema-based columns:', schemaColumns)
+            
+            // Use schema columns if available, otherwise fall back to data columns
+            finalColumns = schemaColumns.length > 0 ? schemaColumns : generatedColumns
+            
+            fields = generateFormFieldsFromSchema(finalColumns, schemaResponse.data)
+            schema = generateCollectionSchemaFromSchema(finalColumns, schemaResponse.data)
+          } else {
+            console.log('CollectionDataTableWrapper: No schema available, using basic field generation')
+            finalColumns = generatedColumns
+            fields = generateFormFields(finalColumns)
+            schema = generateCollectionSchema(finalColumns)
+          }
+        } catch (error) {
+          console.log('CollectionDataTableWrapper: Schema fetch failed, using basic field generation:', error)
+          finalColumns = generatedColumns
+          fields = generateFormFields(finalColumns)
+          schema = generateCollectionSchema(finalColumns)
+        }
+        
+        console.log('CollectionDataTableWrapper: Final columns:', finalColumns)
+        console.log('CollectionDataTableWrapper: Generated fields:', fields)
+        console.log('CollectionDataTableWrapper: Generated schema:', schema)
+        
+        setColumns(finalColumns)
+        setFormFields(fields)
+        setFormSchema(schema)
+        
       } catch (error) {
-        console.error(`Error fetching schema for ${collectionName}:`, error)
-        // Fallback to basic columns
+        console.error(`Error initializing collection ${collectionName}:`, error)
+        
+        // Set fallback values on error
         setColumns([
           { key: 'id', label: 'ID', width: '80px', sortable: true, filterable: true },
           { key: 'name', label: 'Name', width: 'auto', sortable: true, filterable: true }
         ])
+        
+        const fallbackFields = generateFormFields([
+          { key: 'id', label: 'ID', width: '80px', sortable: true, filterable: true },
+          { key: 'name', label: 'Name', width: 'auto', sortable: true, filterable: true }
+        ])
+        const fallbackSchema = generateCollectionSchema([
+          { key: 'id', label: 'ID', width: '80px', sortable: true, filterable: true },
+          { key: 'name', label: 'Name', width: 'auto', sortable: true, filterable: true }
+        ])
+        
+        setFormFields(fallbackFields)
+        setFormSchema(fallbackSchema)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchSchema()
-  }, [collectionName]) // Add collectionName as dependency
-
-  // Memoized operations to prevent recreation
-  const operations = {
-    create: async (data: any) => {
-      try {
-        await itemsAPI.create(collectionName.toLowerCase(), data)
-        console.log(`Created ${collectionName} item:`, data)
-      } catch (error) {
-        console.error(`Error creating ${collectionName} item:`, error)
-        throw error
-      }
-    },
-    edit: async (id: string, data: any) => {
-      try {
-        await itemsAPI.update(collectionName.toLowerCase(), id, data)
-        console.log(`Updated ${collectionName} item:`, id, data)
-      } catch (error) {
-        console.error(`Error updating ${collectionName} item:`, error)
-        throw error
-      }
-    },
-    delete: async (id: string) => {
-      try {
-        await itemsAPI.delete(collectionName.toLowerCase(), id)
-        console.log(`Deleted ${collectionName} item:`, id)
-      } catch (error) {
-        console.error(`Error deleting ${collectionName} item:`, error)
-        throw error
-      }
-    },
-    view: (id: string) => {
-      console.log(`Viewing ${collectionName} item:`, id)
-    }
-  }
+    initializeCollection()
+  }, [collectionName])
 
   if (isLoading || !collectionName) {
     return (
@@ -166,10 +196,10 @@ export function CollectionDataTableWrapper({
       collectionName={collectionName}
       displayName={displayName}
       columns={columns}
-      onCreate={operations.create}
-      onEdit={operations.edit}
-      onDelete={operations.delete}
-      onView={operations.view}
+      schema={formSchema}
+      fieldConfigs={formFields}
+      crudActions={crudActions}
+      crudState={crudState}
     />
   )
 }

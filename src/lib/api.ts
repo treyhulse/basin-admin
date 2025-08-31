@@ -237,6 +237,10 @@ export const fieldsAPI = {
     const response = await api.get(`/items/fields/${id}`);
     return response.data;
   },
+  getByCollection: async (collectionId: string) => {
+    const response = await api.get(`/items/fields?collection_id=${collectionId}`);
+    return response.data;
+  },
   create: async (fieldData: {
     name: string;
     collection_id: string;

@@ -4,7 +4,7 @@ import { useAuth } from '@/components/providers/auth-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Users, Calendar, Globe, Shield, Settings } from 'lucide-react';
+import { Building2, Users, Globe, Shield, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function OrganizationPage() {

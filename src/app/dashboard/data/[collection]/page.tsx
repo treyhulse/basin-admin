@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { CollectionDataTableWrapper } from "@/components/data/collection-data-table-wrapper"
+import { useCollectionCrud } from "@/hooks/use-collection-crud"
 
 interface CollectionPageProps {
   params: Promise<{ collection: string }>
@@ -10,6 +11,9 @@ interface CollectionPageProps {
 export default function CollectionPage({ params }: CollectionPageProps) {
   const [collectionName, setCollectionName] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
+
+  // Always call the hook to maintain hook order consistency
+  const { actions, state } = useCollectionCrud({ collectionName })
 
   useEffect(() => {
     const getCollectionName = async () => {
@@ -39,7 +43,11 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
   return (
     <div className="container mx-auto py-6">
-      <CollectionDataTableWrapper collectionName={collectionName} />
+      <CollectionDataTableWrapper 
+        collectionName={collectionName}
+        crudActions={actions}
+        crudState={state}
+      />
     </div>
   )
 }
