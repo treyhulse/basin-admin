@@ -4,11 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/auth-provider';
 
-interface ProtectedRouteProps {
+interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -18,21 +18,21 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Show loading spinner while checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Don't render anything while redirecting
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Show loading only for the page content, not the entire dashboard
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;

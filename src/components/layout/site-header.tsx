@@ -37,7 +37,7 @@ export function SiteHeader() {
       
       // Convert segment to readable title
       let title = segment
-        .split('-')
+        .split(/[-_]/) // Split on both hyphens and underscores
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
       

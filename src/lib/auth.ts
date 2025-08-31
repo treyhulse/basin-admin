@@ -127,7 +127,6 @@ export const getCurrentUser = (): User | null => {
   }
 
   try {
-    const decoded = jwtDecode<JWTPayload>(token);
     // For now, we'll need to fetch user details from /auth/context
     // This is a simplified version
     return null;

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { getAuthToken, removeAuthToken } from './auth';
 import { AuthResponse, AuthContextResponse, SignUpRequest } from './auth';
 
@@ -91,7 +91,7 @@ export const usersAPI = {
     const response = await api.post('/items/users', userData);
     return response.data;
   },
-  update: async (id: string, userData: any) => {
+  update: async (id: string, userData: Record<string, unknown>) => {
     const response = await api.put(`/items/users/${id}`, userData);
     return response.data;
   },
@@ -127,7 +127,7 @@ export const rolesAPI = {
     const response = await api.post('/items/roles', roleData);
     return response.data;
   },
-  update: async (id: string, roleData: any) => {
+  update: async (id: string, roleData: Record<string, unknown>) => {
     const response = await api.put(`/items/roles/${id}`, roleData);
     return response.data;
   },
@@ -166,7 +166,7 @@ export const permissionsAPI = {
     const response = await api.post('/items/permissions', permissionData);
     return response.data;
   },
-  update: async (id: string, permissionData: any) => {
+  update: async (id: string, permissionData: Record<string, unknown>) => {
     const response = await api.put(`/items/permissions/${id}`, permissionData);
     return response.data;
   },
@@ -206,7 +206,7 @@ export const collectionsAPI = {
     const response = await api.post('/items/collections', collectionData);
     return response.data;
   },
-  update: async (id: string, collectionData: any) => {
+  update: async (id: string, collectionData: Record<string, unknown>) => {
     const response = await api.put(`/items/collections/${id}`, collectionData);
     return response.data;
   },
@@ -243,13 +243,13 @@ export const fieldsAPI = {
     field_type: string;
     is_required?: boolean;
     is_primary?: boolean;
-    validation_rules?: any;
+    validation_rules?: Record<string, unknown>;
     tenant_id?: string;
   }) => {
     const response = await api.post('/items/fields', fieldData);
     return response.data;
   },
-  update: async (id: string, fieldData: any) => {
+  update: async (id: string, fieldData: Record<string, unknown>) => {
     const response = await api.put(`/items/fields/${id}`, fieldData);
     return response.data;
   },
@@ -287,7 +287,7 @@ export const apiKeysAPI = {
     const response = await api.post('/items/api-keys', apiKeyData);
     return response.data;
   },
-  update: async (id: string, apiKeyData: any) => {
+  update: async (id: string, apiKeyData: Record<string, unknown>) => {
     const response = await api.put(`/items/api-keys/${id}`, apiKeyData);
     return response.data;
   },
@@ -364,11 +364,11 @@ export const itemsAPI = {
     const response = await api.get(`/items/${table}/${id}`);
     return response.data;
   },
-  create: async (table: string, data: any) => {
+  create: async (table: string, data: Record<string, unknown>) => {
     const response = await api.post(`/items/${table}`, data);
     return response.data;
   },
-  update: async (table: string, id: string, data: any) => {
+  update: async (table: string, id: string, data: Record<string, unknown>) => {
     const response = await api.put(`/items/${table}/${id}`, data);
     return response.data;
   },

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertTriangle, XCircle, Clock, Shield, Database } from "lucide-react"
 
 export default function TermsPage() {
@@ -40,7 +40,7 @@ export default function TermsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  By accessing or using Basin ("the Service"), you agree to be bound by these Terms of Service. 
+                  By accessing or using Basin (&quot;the Service&quot;), you agree to be bound by these Terms of Service. 
                   If you do not agree to these terms, do not use the Service.
                 </p>
                 <p className="text-muted-foreground">
@@ -82,7 +82,7 @@ export default function TermsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  <strong>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT ANY WARRANTIES OF ANY KIND.</strong>
+                  <strong>THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT ANY WARRANTIES OF ANY KIND.</strong>
                 </p>
                 <p className="text-muted-foreground">
                   Basin explicitly disclaims all warranties, including but not limited to:
@@ -96,7 +96,7 @@ export default function TermsPage() {
                   <li>Warranties of security or data protection</li>
                 </ul>
                 <p className="text-muted-foreground">
-                  <strong>NO PROMISES:</strong> We make no promises about the Service's functionality, 
+                  <strong>NO PROMISES:</strong> We make no promises about the Service&apos;s functionality, 
                   reliability, security, or suitability for any purpose.
                 </p>
               </CardContent>
@@ -192,7 +192,7 @@ export default function TermsPage() {
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
                   <li>Basin shall not be liable for any indirect, incidental, special, consequential, or punitive damages</li>
                   <li>Basin shall not be liable for any loss of profits, data, or business opportunities</li>
-                  <li>Basin's total liability shall not exceed the amount you paid for the Service (if any)</li>
+                  <li>Basin&apos;s total liability shall not exceed the amount you paid for the Service (if any)</li>
                   <li>In no event shall Basin be liable for any damages arising from your use of the Service</li>
                 </ul>
                 <p className="text-muted-foreground">
@@ -210,7 +210,7 @@ export default function TermsPage() {
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
                   You agree to indemnify, defend, and hold harmless Basin from and against any claims, 
-                  damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) 
+                  damages, losses, liabilities, costs, and expenses (including reasonable attorneys&apos; fees) 
                   arising from:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Plus, Edit, Trash2, Users, Key, Settings } from 'lucide-react';
+import { Shield, Plus, Edit, Trash2, Users, Key } from 'lucide-react';
 import { rolesAPI, permissionsAPI } from '@/lib/api';
 
 interface Role {
@@ -31,7 +31,7 @@ export default function RolesClient() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreatingRole, setIsCreatingRole] = useState(false);
+
   const [newRole, setNewRole] = useState({
     name: '',
     description: '',
@@ -72,7 +72,7 @@ export default function RolesClient() {
           description: '',
           permissions: [],
         });
-        setIsCreatingRole(false);
+
         fetchRoles(); // Refresh the list
       } catch (error) {
         console.error('Failed to create role:', error);
@@ -234,9 +234,9 @@ export default function RolesClient() {
               <Plus className="h-4 w-4 mr-2" />
               Create Role
             </Button>
-            <Button variant="outline" onClick={() => setIsCreatingRole(false)}>
-              Cancel
-            </Button>
+                                <Button variant="outline">
+                      Cancel
+                    </Button>
           </div>
         </CardContent>
       </Card>

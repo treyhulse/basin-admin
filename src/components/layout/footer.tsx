@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
+import Image from "next/image"
 
 export function Footer() {
   return (
@@ -9,10 +10,12 @@ export function Footer() {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <img 
+              <Image 
                 src="/logos/basin-logo.svg" 
                 alt="Basin Logo" 
                 className="h-20 w-20"
+                width={80}
+                height={80}
               />
               <span className="text-xl font-bold text-foreground">Basin</span>
             </div>

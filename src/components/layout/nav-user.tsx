@@ -6,7 +6,6 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Settings,
   User,
 } from "lucide-react"
 
@@ -14,7 +13,6 @@ import { useAuth } from "@/components/providers/auth-provider"
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,

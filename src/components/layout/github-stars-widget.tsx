@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Star, Github } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 

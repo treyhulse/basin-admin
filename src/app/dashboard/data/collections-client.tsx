@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Database, Edit, Trash2, Settings, Eye, Calendar } from 'lucide-react';
+import { Plus, Database, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { collectionsAPI, fieldsAPI, itemsAPI } from '@/lib/api';
+import { collectionsAPI, fieldsAPI } from '@/lib/api';
+import Link from 'next/link';
 
 interface Collection {
   id: string;
@@ -26,7 +27,7 @@ interface Field {
   field_type: string;
   is_required: boolean;
   is_primary: boolean;
-  validation_rules?: any;
+  validation_rules?: Record<string, unknown>;
   description?: string;
 }
 
@@ -36,6 +37,7 @@ export default function CollectionsClient() {
   const [selectedCollection, setSelectedCollection] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+
   const [newCollection, setNewCollection] = useState({
     name: '',
     description: '',
@@ -136,21 +138,29 @@ export default function CollectionsClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Collections</h1>
+        <h1 className="text-3xl font-bold">Data Collections</h1>
         <p className="mt-2">
           Manage your data collections and their field configurations.
         </p>
       </div>
 
       {/* Create New Collection */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Collection</CardTitle>
-          <CardDescription>
-            Define a new data collection with custom fields
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {!isCreatingCollection ? (
+        <div className="text-center py-8">
+          <Button onClick={() => setIsCreatingCollection(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Collection
+          </Button>
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Create New Collection</CardTitle>
+            <CardDescription>
+              Define a new data collection with custom fields
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="name">Collection Name</Label>
@@ -195,7 +205,8 @@ export default function CollectionsClient() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      )}
 
       {/* Collections Overview */}
       <Card>
@@ -242,6 +253,19 @@ export default function CollectionsClient() {
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
+                </div>
+                <div className="mt-3 pt-3 border-t">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    asChild
+                    className="w-full justify-between"
+                  >
+                    <Link href={`/dashboard/data/${collection.name.toLowerCase()}`}>
+                      View Data
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
               </div>
             ))}

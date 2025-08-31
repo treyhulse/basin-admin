@@ -1,11 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { 
   Database, 
   Eye, 
   Key, 
   Shield, 
   Zap, 
-  BarChart3,
   Lock,
   Globe
 } from "lucide-react"

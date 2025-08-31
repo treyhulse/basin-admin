@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { 
   User, 
-  Mail, 
-  Calendar, 
   Shield, 
   Key, 
   Settings,

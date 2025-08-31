@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -37,8 +37,9 @@ export interface CollectionData {
 
 export interface CollectionDataTableProps {
   collectionName: string
+  displayName: string
   data?: CollectionData[] // Make optional since we'll fetch it
-  columns: DataColumn[]
+  columns: DataColumn[] // Make optional since we'll fetch it
   loading?: boolean
   onCreate?: (data: any) => Promise<void>
   onEdit?: (id: string, data: any) => Promise<void>
@@ -104,6 +105,7 @@ const getFieldType = (column: DataColumn) => {
 
 export function CollectionDataTable({
   collectionName,
+  displayName,
   data,
   columns,
   loading = false,
@@ -127,7 +129,7 @@ export function CollectionDataTable({
   const [editingData, setEditingData] = useState<any>({})
 
   // Fetch data from database
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true)
       const response = await itemsAPI.list(collectionName.toLowerCase())
@@ -138,12 +140,16 @@ export function CollectionDataTable({
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // Initial data fetch
-  useEffect(() => {
-    fetchData()
   }, [collectionName])
+
+  // Initial data fetch - only when collectionName changes
+  useEffect(() => {
+    console.log('CollectionDataTable: useEffect running for collection:', collectionName)
+    if (collectionName) {
+      console.log('CollectionDataTable: Fetching data for collection:', collectionName)
+      fetchData()
+    }
+  }, [collectionName]) // Only depend on collectionName, not fetchData
 
   // Update data when prop changes (if provided)
   useEffect(() => {
@@ -362,7 +368,7 @@ export function CollectionDataTable({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Loading {collectionName}...</CardTitle>
+          <CardTitle>Loading {displayName}...</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -378,9 +384,9 @@ export function CollectionDataTable({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">{collectionName}</h2>
+          <h2 className="text-4xl font-bold tracking-tight">{displayName}</h2>
           <p className="text-muted-foreground">
-            Manage your {collectionName.toLowerCase()} data
+            Manage your {displayName.toLowerCase()} data
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -397,7 +403,7 @@ export function CollectionDataTable({
           </Button>
           {onCreate && (
             <Button onClick={() => setIsCreateOpen(true)}>
-              Add {collectionName.slice(0, -1)}
+              Add {displayName.slice(0, -1)}
             </Button>
           )}
         </div>
@@ -591,8 +597,8 @@ export function CollectionDataTable({
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
             mode="create"
-            title={`Create ${collectionName.slice(0, -1)}`}
-            description={`Add a new ${collectionName.slice(0, -1).toLowerCase()} to the collection`}
+            title={`Create ${displayName.slice(0, -1)}`}
+            description={`Add a new ${displayName.slice(0, -1).toLowerCase()} to the collection`}
             schema={formSchema}
             onSubmit={handleCreate}
             fields={
@@ -619,8 +625,8 @@ export function CollectionDataTable({
             open={isEditOpen}
             onOpenChange={setIsEditOpen}
             mode="edit"
-            title={`Edit ${collectionName.slice(0, -1)}`}
-            description={`Update the ${collectionName.slice(0, -1).toLowerCase()} information`}
+            title={`Edit ${displayName.slice(0, -1)}`}
+            description={`Update the ${displayName.slice(0, -1).toLowerCase()} information`}
             schema={formSchema}
             defaultValues={editingData}
             onSubmit={handleEdit}
@@ -648,8 +654,8 @@ export function CollectionDataTable({
           open={isDeleteOpen}
           onOpenChange={setIsDeleteOpen}
           mode="delete"
-          title={`Delete ${collectionName.slice(0, -1)}`}
-          description={`Are you sure you want to delete this ${collectionName.slice(0, -1).toLowerCase()}? This action cannot be undone.`}
+          title={`Delete ${displayName.slice(0, -1)}`}
+          description={`Are you sure you want to delete this ${displayName.slice(0, -1).toLowerCase()}? This action cannot be undone.`}
           onDelete={handleDelete}
         />
       )}

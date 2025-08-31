@@ -139,7 +139,7 @@ export default function PricingPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <h4 className="font-semibold text-sm text-foreground mb-3">What's included:</h4>
+                      <h4 className="font-semibold text-sm text-foreground mb-3">What&apos;s included:</h4>
                       <ul className="space-y-2">
                         {plan.features.map((feature, featureIndex) => (
                           <li key={featureIndex} className="flex items-center text-sm">
@@ -213,7 +213,7 @@ export default function PricingPage() {
                 <CardContent>
                   <p className="text-muted-foreground">
                     Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, 
-                    and we'll prorate any charges.
+                    and we&apos;ll prorate any charges.
                   </p>
                 </CardContent>
               </Card>
@@ -236,7 +236,7 @@ export default function PricingPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    We'll notify you when you're approaching limits. You can either upgrade your plan 
+                    We&apos;ll notify you when you&apos;re approaching limits. You can either upgrade your plan 
                     or purchase additional add-ons to continue growing.
                   </p>
                 </CardContent>

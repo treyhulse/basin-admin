@@ -1,7 +1,19 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 export function HeroSection() {
+  const scrollToDemo = () => {
+    const demoSection = document.getElementById('demo')
+    if (demoSection) {
+      demoSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+
   return (
     <section className="relative overflow-hidden py-20 sm:py-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,10 +54,13 @@ export function HeroSection() {
                 Start Building Free
               </Link>
             </Button>
-            <Button variant="outline" size="lg" asChild className="px-8 py-3 text-lg">
-              <Link href="#demo">
-                See It In Action
-              </Link>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={scrollToDemo}
+              className="px-8 py-3 text-lg"
+            >
+              See It In Action
             </Button>
           </div>
         </div>

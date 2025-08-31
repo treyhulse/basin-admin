@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { AuthSection } from "@/components/layout/auth-section"
+import Image from "next/image"
 
 export function Navbar() {
   return (
@@ -11,10 +12,12 @@ export function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img 
+              <Image 
                 src="/logos/basin-logo.svg" 
                 alt="Basin Logo" 
                 className="h-10 w-10"
+                width={36}
+                height={36}
               />
               <span className="text-xl font-bold text-foreground">Basin</span>
             </Link>

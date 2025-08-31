@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { 
   User, 
   getAuthToken, 
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAuth(null);
   };
 
-  const refreshAuthContext = async () => {
+  const refreshAuthContext = useCallback(async () => {
     try {
       const authContext = await authAPI.getAuthContext();
       setUser(authContext.user);
@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Failed to refresh auth context:', error);
       logout();
     }
-  };
+  }, []);
 
   const switchTenant = async (tenantId: string) => {
     try {
@@ -143,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-  }, []);
+  }, []); // Remove refreshAuthContext from dependencies - it's now stable
 
   const value: AuthContextType = {
     user,

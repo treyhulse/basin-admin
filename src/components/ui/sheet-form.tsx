@@ -45,13 +45,6 @@ export interface SheetFormProps<T extends FieldValues> {
   showValidation?: boolean
 }
 
-// Size configurations
-const sizeConfig = {
-  sm: "w-80",
-  md: "w-96", 
-  lg: "w-[40vw]",
-  xl: "w-[45vw]"
-}
 
 // Mode configurations
 const modeConfig = {

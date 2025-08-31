@@ -91,7 +91,7 @@ export function UseCasesSection() {
               Perfect For Every Use Case
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Whether you're building your next big idea or scaling existing applications, 
+              Whether you&apos;re building your next big idea or scaling existing applications, 
               Basin Admin adapts to your needs.
             </p>
           </div>

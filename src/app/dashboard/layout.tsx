@@ -1,6 +1,6 @@
 'use client';
 
-import ProtectedRoute from '@/components/auth/protected-route';
+import AuthGuard from '@/components/auth/auth-guard';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SiteHeader } from '@/components/layout/site-header';
 import {
@@ -25,7 +25,9 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         
         {/* Main content */}
         <main className="flex-1 p-8">
-          {children}
+          <AuthGuard>
+            {children}
+          </AuthGuard>
         </main>
       </SidebarInset>
     </SidebarProvider>
@@ -33,9 +35,5 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  return (
-    <ProtectedRoute>
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
-    </ProtectedRoute>
-  );
+  return <DashboardLayoutContent>{children}</DashboardLayoutContent>;
 }

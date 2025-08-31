@@ -94,14 +94,6 @@ export function AuthSection() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        {/* User name - hidden on mobile, shown on sm and up */}
-        {!isMobile && (
-          <div className="hidden sm:block">
-            <p className="text-sm font-medium text-foreground truncate max-w-[120px] lg:max-w-[150px]">
-              {fullName || user.email}
-            </p>
-          </div>
-        )}
       </div>
     )
   }

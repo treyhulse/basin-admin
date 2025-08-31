@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  Bot,
   Brain,
   ChevronRight,
   Cpu,
   MoreHorizontal,
   Sparkles,
+  SquarePlus,
   type LucideIcon,
 } from "lucide-react"
 import Link from "next/link"
@@ -43,6 +43,7 @@ export function NavMCP({
     name: string
     url: string
     icon: LucideIcon
+    isActive?: boolean
     items?: {
       title: string
       url: string
@@ -59,14 +60,14 @@ export function NavMCP({
           <Collapsible
             key={item.name}
             asChild
-            defaultOpen={false}
+            defaultOpen={item.isActive}
             className="group/collapsible"
           >
             <SidebarMenuItem>
               {item.items ? (
                 <>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.name}>
+                    <SidebarMenuButton tooltip={item.name} isActive={item.isActive}>
                       <item.icon />
                       <span>{item.name}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -88,7 +89,7 @@ export function NavMCP({
                 </>
               ) : (
                 <>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={item.isActive}>
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.name}</span>
@@ -128,7 +129,7 @@ export function NavMCP({
         ))}
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
-            <Bot className="text-sidebar-foreground/70" />
+            <SquarePlus className="text-sidebar-foreground/70" />
             <span>Add MCP Tool</span>
           </SidebarMenuButton>
         </SidebarMenuItem>

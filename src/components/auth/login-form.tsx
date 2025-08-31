@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Tenant } from "@/lib/auth"
+import Image from "next/image"
 
 interface LoginFormProps extends React.ComponentProps<"div"> {
   email: string;
@@ -199,10 +200,12 @@ export function LoginForm({
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
               src="/placeholder.svg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              width={1000}
+              height={1000}
             />
           </div>
         </CardContent>

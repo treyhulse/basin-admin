@@ -238,7 +238,7 @@ export default function DocsPage() {
           <div className="mb-20">
             <Card className="border-0 shadow-lg bg-muted/50">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Can't find what you're looking for?</CardTitle>
+                <CardTitle className="text-2xl">Can&apos;t find what you&apos;re looking for?</CardTitle>
                 <CardDescription className="text-lg">
                   Search our documentation or get help from our team.
                 </CardDescription>

@@ -22,7 +22,7 @@ import {
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
-  const { tenant, auth, switchTenant } = useAuth()
+  const { tenant } = useAuth()
   
   // For now, we'll show a single tenant since the API might not support multiple tenants yet
   // In the future, this could be expanded to show multiple tenants if the user has access to them
