@@ -421,6 +421,8 @@ function createZodFieldFromSchema(schemaField: any, column: DataColumn): z.ZodTy
   const fieldType = inferFieldTypeFromSchema(schemaField)
   let field: z.ZodTypeAny
   
+  console.log(`createZodFieldFromSchema: Creating field for '${schemaField.name}' with type '${fieldType}'`)
+  
   switch (fieldType) {
     case 'email':
       field = z.string().email('Invalid email address')
@@ -448,7 +450,9 @@ function createZodFieldFromSchema(schemaField: any, column: DataColumn): z.ZodTy
   }
   
   // Add validation rules based on schema
-  if (schemaField.required && z.string().safeParse(field).success) {
+  const isRequired = schemaField.is_required || schemaField.required || false
+  
+  if (isRequired && z.string().safeParse(field).success) {
     field = (field as z.ZodString).min(1, `${column.label} is required`)
   }
   
@@ -464,7 +468,7 @@ function createZodFieldFromSchema(schemaField: any, column: DataColumn): z.ZodTy
     field = (field as z.ZodString).regex(new RegExp(schemaField.pattern), 'Invalid format')
   }
   
-  return schemaField.required ? field : field.optional()
+  return isRequired ? field : field.optional()
 }
 
 
