@@ -322,7 +322,7 @@ async function main() {
           content: [
             {
               type: "text",
-              text: `❌ Basin API connection failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${BASIN_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+              text: `❌ Basin API connection failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
             }
           ]
         };
