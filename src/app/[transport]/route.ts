@@ -1,7 +1,22 @@
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
-import { collectionsAPI } from "@/lib/api";
+import axios from "axios";
+import { config } from "@/lib/config";
+
+// Hardcoded bearer token for development/testing
+// TODO: This token will expire - you may need to refresh it periodically
+// For production, consider using environment variables or dynamic token generation
+const HARDCODED_AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2E4MDI3ZTMtMTkwZC00MmU4LWI4ZjgtMmUzYmQyMzhjZjdiIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInRlbmFudF9pZCI6IjhkYTZkYTIwLWE1YjgtNDg5MC05Yzg4LWIwMDRhZTFlNjk4ZCIsInRlbmFudF9zbHVnIjoibWFpbiIsInNlc3Npb25faWQiOiI0OWNkMTRkNS03ZTQ1LTQzYjctOTQ2My01YzYwMDMzMTQzNGMiLCJleHAiOjE3NTY3NjY1MDEsIm5iZiI6MTc1NjY4MDEwMSwiaWF0IjoxNzU2NjgwMTAxfQ.gE1HHyBCjdaVLrkD9PXe3tgiMAQB0ZF5nBbq97pNW38";
+
+// Create authenticated API instance for MCP tools
+const authenticatedAPI = axios.create({
+  baseURL: config.api.baseURL,
+  headers: {
+    Authorization: `Bearer ${HARDCODED_AUTH_TOKEN}`,
+    'Content-Type': 'application/json'
+  }
+});
 
 const handler = createMcpHandler(
   async (server) => {
@@ -22,13 +37,13 @@ const handler = createMcpHandler(
       },
       async (params) => {
         try {
-          const collections = await collectionsAPI.list(params);
+          const response = await authenticatedAPI.get('/items/collections', { params });
+          const collections = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully retrieved ${collections.data?.length || 0} collections.`,
-                data: collections
+                text: `Successfully retrieved ${collections?.length || 0} collections.`
               }
             ]
           };
@@ -37,8 +52,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error listing collections: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error listing collections: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -55,13 +69,13 @@ const handler = createMcpHandler(
       },
       async ({ id }) => {
         try {
-          const collection = await collectionsAPI.get(id);
+          const response = await authenticatedAPI.get(`/items/collections/${id}`);
+          const collection = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully retrieved collection: ${collection.data?.name || 'Unknown'}`,
-                data: collection
+                text: `Successfully retrieved collection: ${collection?.name || 'Unknown'}`
               }
             ]
           };
@@ -70,8 +84,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error retrieving collection: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error retrieving collection: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -92,13 +105,13 @@ const handler = createMcpHandler(
       },
       async ({ name, description, icon, is_primary, tenant_id }) => {
         try {
-          const collection = await collectionsAPI.create({ name, description, icon, is_primary, tenant_id });
+          const response = await authenticatedAPI.post('/items/collections', { name, description, icon, is_primary, tenant_id });
+          const collection = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully created collection: ${collection.data?.name || 'Unknown'}`,
-                data: collection
+                text: `Successfully created collection: ${collection?.name || 'Unknown'}`
               }
             ]
           };
@@ -107,8 +120,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error creating collection: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error creating collection: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -130,13 +142,13 @@ const handler = createMcpHandler(
       },
       async ({ id, ...updateData }) => {
         try {
-          const collection = await collectionsAPI.update(id, updateData);
+          const response = await authenticatedAPI.put(`/items/collections/${id}`, updateData);
+          const collection = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully updated collection: ${collection.data?.name || 'Unknown'}`,
-                data: collection
+                text: `Successfully updated collection: ${collection?.name || 'Unknown'}`
               }
             ]
           };
@@ -145,8 +157,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error updating collection: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error updating collection: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -163,13 +174,12 @@ const handler = createMcpHandler(
       },
       async ({ id }) => {
         try {
-          await collectionsAPI.delete(id);
+          await authenticatedAPI.delete(`/items/collections/${id}`);
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully deleted collection with ID: ${id}`,
-                data: { deletedId: id }
+                text: `Successfully deleted collection with ID: ${id}`
               }
             ]
           };
@@ -178,8 +188,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error deleting collection: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error deleting collection: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -208,17 +217,17 @@ const handler = createMcpHandler(
           
           if (operation === "create") {
             for (const collection of collections) {
-              const result = await collectionsAPI.create(collection);
-              results.push(result);
+              const response = await authenticatedAPI.post('/items/collections', collection);
+              results.push(response.data);
             }
           } else if (operation === "update" && ids) {
             for (let i = 0; i < ids.length; i++) {
-              const result = await collectionsAPI.update(ids[i], collections[i] || {});
-              results.push(result);
+              const response = await authenticatedAPI.put(`/items/collections/${ids[i]}`, collections[i] || {});
+              results.push(response.data);
             }
           } else if (operation === "delete" && ids) {
             for (const id of ids) {
-              await collectionsAPI.delete(id);
+              await authenticatedAPI.delete(`/items/collections/${id}`);
               results.push({ deletedId: id });
             }
           }
@@ -227,8 +236,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Successfully completed bulk ${operation} operation on ${results.length} collections`,
-                data: { results, operation, count: results.length }
+                text: `Successfully completed bulk ${operation} operation on ${results.length} collections`
               }
             ]
           };
@@ -237,8 +245,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `Error in bulk ${operation} operation: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                error: true
+                text: `Error in bulk ${operation} operation: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
