@@ -11,6 +11,11 @@ const inter = Outfit({ subsets: ["latin"], weight: ["300", "400", "700"] });
 export const metadata: Metadata = {
   title: "Basin",
   description: "Comprehensive admin interface for Basin API, Data Management, MCP Servers, and more.",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({

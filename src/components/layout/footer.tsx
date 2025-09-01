@@ -11,7 +11,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Image 
-                src="/logos/basin-logo.svg" 
+                src="/logo.svg" 
                 alt="Basin Logo" 
                 className="h-20 w-20"
                 width={80}

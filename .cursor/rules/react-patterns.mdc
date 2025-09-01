@@ -1,0 +1,44 @@
+# React Patterns & Component Architecture
+
+## Server vs Client Components
+- **Server Components**: Default in Next.js 15, use for data fetching and static content
+- **Client Components**: Add `"use client"` directive only when necessary (state, effects, event handlers)
+- Prefer server components when possible to reduce client-side JavaScript
+
+## Component Structure
+```tsx
+// Server Component (default)
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  return <div>Content for {slug}</div>
+}
+
+// Client Component (when needed)
+"use client"
+import { useState, useEffect } from "react"
+export function InteractiveComponent() {
+  const [state, setState] = useState()
+  // ... component logic
+}
+```
+
+## Props & Types
+- Use TypeScript interfaces for component props
+- Destructure props in function parameters
+- Use `Readonly<>` for props when appropriate
+- Example: `{ children }: Readonly<{ children: React.ReactNode }>`
+
+## State Management
+- Use React Query for server state management
+- Use local state (`useState`) for UI state only
+- Prefer server actions over API routes when possible
+- Use context providers sparingly (auth, theme, query)
+
+## Event Handling
+- Use `onClick`, `onSubmit` handlers for user interactions
+- Prefer server actions for form submissions
+- Handle loading and error states appropriately
+description:
+globs:
+alwaysApply: true
+---

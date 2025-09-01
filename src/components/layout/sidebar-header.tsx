@@ -7,7 +7,7 @@ export function SidebarHeader() {
     <div className="flex items-center justify-start w-full gap-3">
       <Link href="/dashboard" className="shrink-0">
         <Image
-          src="/logos/basin-logo.svg"
+          src="/logo.svg"
           alt="Basin"
           width={36}
           height={36}

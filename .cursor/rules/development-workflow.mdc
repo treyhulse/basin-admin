@@ -1,0 +1,59 @@
+# Development Workflow & Best Practices
+
+## Code Organization
+- Follow the established directory structure
+- Use consistent file naming conventions
+- Group related functionality in appropriate directories
+- Maintain clear separation of concerns
+
+## Component Development
+- Start with server components by default
+- Add `"use client"` only when necessary
+- Use established patterns from existing components
+- Implement proper TypeScript types for all props
+
+## Styling Approach
+- Use Tailwind CSS utility classes
+- Leverage shadcn/ui components
+- Use the `cn()` utility for conditional classes
+- Follow the established color and spacing system
+
+## State Management
+- Use React Query for server state
+- Use local state for UI state only
+- Implement proper loading and error states
+- Use context providers sparingly
+
+## Form Handling
+- Use React Hook Form for form state
+- Validate with Zod schemas
+- Prefer server actions over API routes
+- Implement proper validation feedback
+
+## Error Handling
+- Use consistent error handling patterns
+- Implement proper user feedback
+- Log errors for debugging
+- Use structured error responses
+
+## Testing & Development
+- Test responsive behavior across screen sizes
+- Use development-only features for debugging
+- Implement proper logging for development
+- Test error scenarios and edge cases
+
+## Performance
+- Optimize bundle size with proper imports
+- Use Next.js built-in optimizations
+- Implement proper loading states
+- Use code splitting when appropriate
+
+## Code Quality
+- Follow TypeScript best practices
+- Use proper type definitions
+- Implement consistent error handling
+- Maintain clean and readable code
+description:
+globs:
+alwaysApply: true
+---

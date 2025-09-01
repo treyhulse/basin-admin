@@ -3,10 +3,6 @@
     "basin-admin-mcp-server": {
       "url": "https://basin-admin.vercel.app/mcp",
       "transport": "http"
-    },
-    "basin-admin-sse": {
-      "url": "https://basin-admin.vercel.app/sse",
-      "transport": "sse"
     }
   }
 }

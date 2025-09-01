@@ -13,7 +13,7 @@ export function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image 
-                src="/logos/basin-logo.svg" 
+                src="/logo.svg" 
                 alt="Basin Logo" 
                 className="h-10 w-10"
                 width={36}

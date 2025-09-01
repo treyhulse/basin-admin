@@ -1,0 +1,58 @@
+# MCP (Model Context Protocol) Integration
+
+## Transport Route Structure (`src/app/[transport]/`)
+The `[transport]` route serves as the main MCP server endpoint with multiple transport protocols:
+
+### Route Configuration
+```typescript
+// src/app/[transport]/route.ts
+export { handler as GET, handler as POST, handler as DELETE }
+```
+
+### MCP Handler Setup
+- Uses `createMcpHandler` from `mcp-handler` package
+- Supports both HTTP and SSE (Server-Sent Events) transports
+- Configured with Redis for state management and streaming
+
+### Transport Endpoints
+- **SSE Endpoint**: `/sse` - Real-time streaming for live updates
+- **HTTP Endpoint**: `/mcp` - Standard HTTP requests/responses
+- **Redis Integration**: Uses `REDIS_URL` for persistent state
+
+### Tool Definition Pattern
+```typescript
+server.tool(
+  "toolName",
+  "Tool description",
+  {
+    // Zod schema for parameters
+    param: z.string()
+  },
+  async ({ param }) => ({
+    content: [{ type: "text", text: "response" }]
+  })
+)
+```
+
+### Capabilities Configuration
+- Define tool capabilities in the handler configuration
+- Each tool must have a description for discovery
+- Tools are automatically registered with the MCP server
+
+### Streaming & Real-time Features
+- **SSE**: Enables real-time communication with clients
+- **Max Duration**: 60 seconds for long-running operations
+- **Verbose Logs**: Development-friendly logging enabled
+- **Redis**: Handles connection state and message persistence
+
+## MCP Dashboard Integration
+- Monitor transport status in `src/app/dashboard/mcp/`
+- Real-time updates via SSE connection
+- Tool discovery and status monitoring
+- Connection health and performance metrics
+
+## Development & Testing
+- Use `npm run mcp:inspect` for MCP debugging
+- Test both HTTP and SSE endpoints
+- Monitor Redis connections and state
+- Verify tool registration and capabilities

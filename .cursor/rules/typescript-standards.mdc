@@ -1,0 +1,59 @@
+# TypeScript Standards & Type Safety
+
+## Type Definitions
+- Use interfaces for object shapes and component props
+- Use type aliases for unions, intersections, and complex types
+- Export types and interfaces from dedicated type files
+- Use generic types for reusable components and functions
+
+## Component Props
+```typescript
+// Use interfaces for component props
+interface ComponentProps {
+  title: string
+  children: React.ReactNode
+  optional?: boolean
+}
+
+// Use Readonly for props when appropriate
+export default function Component({ 
+  title, 
+  children 
+}: Readonly<ComponentProps>) {
+  // component implementation
+}
+```
+
+## API Types
+- Define clear interfaces for API requests and responses
+- Use the established `ApiResponse<T>` pattern
+- Include proper error types and status codes
+- Use generic types for reusable API patterns
+
+## Service Classes
+- Define clear interfaces for service configurations
+- Use proper typing for method parameters and return values
+- Implement proper error handling with typed error responses
+- Use generics for flexible data types
+
+## Schema Validation
+- Use Zod schemas for runtime validation
+- Generate TypeScript types from Zod schemas when possible
+- Maintain type safety between frontend and backend
+- Use proper typing for form data and validation
+
+## Import/Export
+- Use named exports for components and utilities
+- Use default exports for pages and main components
+- Use absolute imports with `@/` alias for internal modules
+- Group imports: React, external libraries, internal modules, types
+
+## Type Guards
+- Use type guards for runtime type checking
+- Implement proper narrowing for union types
+- Use `instanceof` and `typeof` appropriately
+- Create custom type guards for complex validation
+description:
+globs:
+alwaysApply: true
+---

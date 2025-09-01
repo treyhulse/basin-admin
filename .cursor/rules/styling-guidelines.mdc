@@ -1,0 +1,41 @@
+# Styling Guidelines - Tailwind CSS & shadcn/ui
+
+## Tailwind CSS Usage
+- Use Tailwind utility classes for styling
+- Prefer utility-first approach over custom CSS
+- Use the `cn()` utility function for conditional classes: `cn("base-class", conditional && "conditional-class")`
+- Import from `@/lib/utils` for the `cn` function
+
+## shadcn/ui Components
+- Use existing shadcn/ui components from `src/components/ui/`
+- Extend variants using `cva` (class-variance-authority) when needed
+- Follow the established component patterns (see [Button component](mdc:src/components/ui/button.tsx))
+- Maintain consistent spacing using Tailwind's spacing scale
+
+## Layout & Spacing
+- Use consistent spacing: `p-4`, `gap-4`, `m-4` for 16px spacing
+- Use responsive prefixes: `md:grid-cols-3`, `lg:p-6`
+- Use flexbox utilities: `flex flex-col gap-4`
+- Use grid utilities: `grid auto-rows-min gap-4 md:grid-cols-3`
+
+## Color System
+- Use semantic color tokens: `bg-primary`, `text-secondary-foreground`
+- Use muted variants: `bg-muted/50` for subtle backgrounds
+- Use destructive colors for errors: `bg-destructive`, `text-destructive`
+- Use accent colors for interactive elements: `hover:bg-accent`
+
+## Component Variants
+- Define variants using `cva` for consistent component styling
+- Use the established pattern from Button component
+- Include proper TypeScript types for variant props
+- Use `defaultVariants` for sensible defaults
+
+## Responsive Design
+- Mobile-first approach with responsive breakpoints
+- Use `md:` prefix for medium screens and up
+- Use `lg:` prefix for large screens and up
+- Test responsive behavior across different screen sizes
+description:
+globs:
+alwaysApply: true
+---

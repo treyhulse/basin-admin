@@ -1,0 +1,38 @@
+# Basin Admin Project Structure
+
+## Core Architecture
+This is a Next.js 15 application with TypeScript, Tailwind CSS, and shadcn/ui components. The app follows a specific architecture for data management and MCP (Model Context Protocol) servers.
+
+## Key Directories
+
+### App Router Structure (`src/app/`)
+- **Marketing pages**: `(marketing)/` - Public pages like login, pricing, docs
+- **Dashboard**: `dashboard/` - Main admin interface with protected routes
+- **API routes**: `api/` - Backend endpoints for collections, MCP, etc.
+- **Dynamic routes**: `[transport]/` - Dynamic route handling
+
+### Components (`src/components/`)
+- **UI components**: `ui/` - shadcn/ui components (Button, Card, Form, etc.)
+- **Layout components**: `layout/` - Navigation, sidebar, header components
+- **Data components**: `data/` - Collection data tables and CRUD operations
+- **Auth components**: `auth/` - Authentication forms and guards
+- **Providers**: `providers/` - React context providers (auth, theme, query)
+
+### Services & Libraries (`src/lib/`)
+- **Services**: `services/` - Business logic for collections, MCP, etc.
+- **Schemas**: `schemas/` - Zod schemas for data validation
+- **API**: `api.ts` - API client configuration
+- **Utils**: `utils.ts` - Utility functions including `cn()` for class merging
+
+### Hooks (`src/hooks/`)
+- Custom React hooks for collections, mobile detection, etc.
+
+## File Naming Conventions
+- Components: PascalCase (e.g., `CollectionDataTable.tsx`)
+- Pages: lowercase with hyphens (e.g., `api-keys/page.tsx`)
+- Utilities: camelCase (e.g., `collection-service.ts`)
+- Constants: UPPER_SNAKE_CASE
+description:
+globs:
+alwaysApply: true
+---

@@ -1,0 +1,61 @@
+# Next.js 15 Patterns & Best Practices
+
+## App Router Structure
+- Use the new App Router (`src/app/` directory)
+- Group related routes using route groups `(marketing)`
+- Use dynamic routes with `[param]` syntax
+- Implement proper layouts for shared UI elements
+
+## Route Parameters
+- Use Promise-based params for dynamic routes
+- Await params in async components
+```typescript
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  return <div>Content for {slug}</div>
+}
+```
+
+## Server vs Client Components
+- **Server Components**: Default, use for data fetching, static content
+- **Client Components**: Add `"use client"` only when needed
+- Prefer server components to reduce client-side JavaScript
+- Use client components for interactivity, state, effects
+
+## Data Fetching
+- Use server components for data fetching when possible
+- Implement proper loading states with Suspense
+- Use server actions for form submissions
+- Cache data appropriately with Next.js caching strategies
+
+## Layouts & Templates
+- Use `layout.tsx` for shared UI across routes
+- Use `template.tsx` for route-specific layouts
+- Implement proper metadata for SEO
+- Use the established layout pattern from [RootLayout](mdc:src/app/layout.tsx)
+
+## API Routes
+- Prefer server actions over API routes when possible
+- Use API routes for external integrations or complex logic
+- Implement proper error handling and status codes
+- Use the established API structure in `src/app/api/`
+
+## Metadata & SEO
+- Use the Metadata API for dynamic metadata
+- Implement proper titles and descriptions
+- Use Open Graph and Twitter Card metadata
+- Follow the established pattern from the root layout
+
+## Performance
+- Use Next.js Image component for optimized images
+- Implement proper loading strategies
+- Use dynamic imports for code splitting
+- Leverage Next.js built-in optimizations
+description:
+globs:
+alwaysApply: true
+---

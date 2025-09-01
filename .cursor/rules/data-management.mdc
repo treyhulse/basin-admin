@@ -1,0 +1,49 @@
+# Data Management & CRUD Operations
+
+## Service Layer Pattern
+- Use service classes for business logic (see [CollectionService](mdc:src/lib/services/collection-service.ts))
+- Services handle API calls, error handling, and data transformation
+- Each service should have a clear interface and error handling
+
+## API Response Structure
+```typescript
+interface ApiResponse<T> {
+  data: T
+  message?: string
+  success: boolean
+}
+```
+
+## Collection Management
+- Use the established collection service pattern for CRUD operations
+- Collections are identified by name (e.g., "users", "products")
+- Use the CollectionDataTableWrapper for displaying collection data
+- Generate schemas dynamically using the schema generation utilities
+
+## Data Fetching
+- Use React Query for server state management
+- Implement proper loading and error states
+- Use the established pagination pattern with `PaginationParams`
+- Handle API errors gracefully with user-friendly messages
+
+## Form Handling
+- Use React Hook Form for form state management
+- Validate data with Zod schemas
+- Use server actions for form submissions when possible
+- Implement proper form validation and error display
+
+## Schema Generation
+- Use the schema utilities in `src/lib/schemas/collection-schemas.ts`
+- Generate forms and tables dynamically from collection schemas
+- Maintain type safety with generated schemas
+- Use Zod for runtime validation
+
+## Error Handling
+- Implement consistent error handling across services
+- Use try-catch blocks for async operations
+- Return structured error responses
+- Log errors appropriately for debugging
+description:
+globs:
+alwaysApply: true
+---
