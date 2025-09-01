@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "basin-admin-mcp-server": {
+    "basin-mcp": {
       "url": "https://basin-admin.vercel.app/mcp",
       "transport": "http"
     }

@@ -7,10 +7,12 @@ export const config = {
   
   // MCP Configuration
   mcp: {
-    serverUrl: process.env.NEXT_PUBLIC_MCP_SERVER_URL || 'http://localhost:3001',
+    serverUrl: process.env.NEXT_PUBLIC_MCP_SERVER_URL || 'https://basin-admin.vercel.app/mcp',
     serverPort: parseInt(process.env.NEXT_PUBLIC_MCP_SERVER_PORT || '3001'),
     enabled: process.env.NEXT_PUBLIC_MCP_ENABLED === 'true',
     healthCheckInterval: parseInt(process.env.NEXT_PUBLIC_MCP_HEALTH_CHECK_INTERVAL || '5000'),
+    productionUrl: 'https://basin-admin.vercel.app/mcp',
+    developmentUrl: 'http://localhost:3001',
   },
   
   // Environment

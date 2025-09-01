@@ -4,11 +4,42 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Cpu, Brain, Bot, RefreshCw, AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { Cpu, Brain, Bot, RefreshCw, AlertCircle, CheckCircle, XCircle, Globe, Monitor } from "lucide-react";
 import { mcpService, MCPServerStatus, MCPTool, MCPModel, MCPResource } from "@/lib/services/mcp-service";
 import { config } from "@/lib/config";
 
+// MCP Server configurations
+const MCP_SERVERS = {
+  production: {
+    name: 'Production',
+    url: config.mcp.productionUrl,
+    icon: Globe,
+    description: 'Live production MCP server (mcp-handler)',
+    type: 'mcp-handler' as const,
+    endpoints: {
+      status: '/mcp',
+      tools: '/mcp',
+      models: '/mcp',
+      resources: '/mcp'
+    }
+  },
+  development: {
+    name: 'Development',
+    url: config.mcp.developmentUrl,
+    icon: Monitor,
+    description: 'Local development MCP server (custom HTTP)',
+    type: 'local-http' as const,
+    endpoints: {
+      status: '/health',
+      tools: '/tools',
+      models: '/models',
+      resources: '/resources'
+    }
+  }
+};
+
 export default function MCPDashboardClient() {
+  const [selectedServer, setSelectedServer] = useState<'production' | 'development'>('production');
   const [serverStatus, setServerStatus] = useState<MCPServerStatus | null>(null);
   const [tools, setTools] = useState<MCPTool[]>([]);
   const [models, setModels] = useState<MCPModel[]>([]);
@@ -16,9 +47,16 @@ export default function MCPDashboardClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
+  const getCurrentServerConfig = () => MCP_SERVERS[selectedServer];
+
   const refreshData = async () => {
     setIsLoading(true);
     try {
+      const currentServer = getCurrentServerConfig();
+      
+      // Set the MCP service to use the selected server URL
+      mcpService.setServerUrl(currentServer.url);
+      
       const [status, toolsData, modelsData, resourcesData] = await Promise.all([
         mcpService.getServerStatus(),
         mcpService.getAvailableTools(),
@@ -33,6 +71,17 @@ export default function MCPDashboardClient() {
       setLastRefresh(new Date());
     } catch (error) {
       console.error('Failed to refresh MCP data:', error);
+      
+      const currentServer = getCurrentServerConfig();
+      let errorMessage = 'Server not available, showing simulated data';
+      
+      // Provide more specific error messages based on server type
+      if (currentServer.type === 'mcp-handler') {
+        errorMessage = 'Production MCP server (mcp-handler) is not responding to HTTP endpoints. This server uses MCP protocol at /mcp endpoint.';
+      } else if (currentServer.type === 'local-http') {
+        errorMessage = 'Local development server is not available. Make sure the MCP server is running on port 3001.';
+      }
+      
       // Fallback to simulated data if server is not available
       const simulatedStats = mcpService.getSimulatedStats();
       setTools(simulatedStats.tools);
@@ -42,9 +91,9 @@ export default function MCPDashboardClient() {
       // Set server status as not running
       setServerStatus({
         isRunning: false,
-        port: config.mcp.serverPort,
+        port: selectedServer === 'development' ? 3001 : 443,
         lastCheck: new Date(),
-        error: 'Server not available, showing simulated data',
+        error: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -58,7 +107,11 @@ export default function MCPDashboardClient() {
     const interval = setInterval(refreshData, config.mcp.healthCheckInterval);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedServer]);
+
+  const handleServerChange = (server: 'production' | 'development') => {
+    setSelectedServer(server);
+  };
 
   const getStatusIcon = (isRunning: boolean) => {
     if (isRunning) {
@@ -67,12 +120,7 @@ export default function MCPDashboardClient() {
     return <XCircle className="h-4 w-4 text-red-600" />;
   };
 
-  const getStatusBadge = (isRunning: boolean) => {
-    if (isRunning) {
-      return <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>;
-    }
-    return <Badge variant="destructive">Inactive</Badge>;
-  };
+
 
   const formatUptime = (uptime?: string) => {
     if (!uptime || uptime === 'Unknown') return 'Unknown';
@@ -91,6 +139,9 @@ export default function MCPDashboardClient() {
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   };
+
+  const currentServer = getCurrentServerConfig();
+  const ServerIcon = currentServer.icon;
 
   return (
     <div className="space-y-6">
@@ -111,6 +162,48 @@ export default function MCPDashboardClient() {
           Refresh
         </Button>
       </div>
+
+      {/* Server Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ServerIcon className="h-5 w-5" />
+            MCP Server Selection
+            {serverStatus && (
+              <Badge variant={serverStatus.isRunning ? "default" : "destructive"} className="ml-2">
+                {serverStatus.isRunning ? 'Connected' : 'Disconnected'}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            {Object.entries(MCP_SERVERS).map(([key, server]) => {
+              const Icon = server.icon;
+              const isSelected = selectedServer === key;
+              return (
+                <Button
+                  key={key}
+                  variant={isSelected ? "default" : "outline"}
+                  onClick={() => handleServerChange(key as 'production' | 'development')}
+                  className="flex items-center gap-2"
+                >
+                  <Icon className="h-4 w-4" />
+                  {server.name}
+                </Button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {currentServer.description} • {currentServer.url}
+          </p>
+          {currentServer.type === 'mcp-handler' && (
+            <p className="mt-1 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+              ⚠️ Production server uses mcp-handler with MCP protocol at /mcp endpoint
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {serverStatus && (
         <div className="rounded-lg border bg-yellow-50 p-4">
@@ -141,8 +234,14 @@ export default function MCPDashboardClient() {
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">
-                Port: {serverStatus?.port || config.mcp.serverPort}
+                Server: {currentServer.name}
               </p>
+              <p className="text-xs text-muted-foreground">
+                URL: {currentServer.url}
+              </p>
+              <Badge variant="outline" className="text-xs">
+                {selectedServer === 'production' ? '🌐 Production' : '💻 Development'}
+              </Badge>
               {serverStatus?.uptime && (
                 <p className="text-xs text-muted-foreground">
                   Uptime: {formatUptime(serverStatus.uptime)}

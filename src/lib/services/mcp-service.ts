@@ -28,46 +28,126 @@ export interface MCPResource {
 }
 
 export class MCPService {
-  private baseUrl: string;
+  public baseUrl: string;
   private healthCheckInterval: number;
+  private serverType: 'mcp-handler' | 'local-http' = 'local-http';
 
   constructor() {
     this.baseUrl = config.mcp.serverUrl;
     this.healthCheckInterval = config.mcp.healthCheckInterval;
   }
 
+  // Method to set the server URL dynamically
+  setServerUrl(url: string) {
+    this.baseUrl = url;
+    // Detect server type based on URL
+    if (url.includes('vercel.app') || url.includes('basin-admin.vercel.app')) {
+      this.serverType = 'mcp-handler';
+    } else {
+      this.serverType = 'local-http';
+    }
+  }
+
+  // Method to get the current server URL
+  getServerUrl() {
+    return this.baseUrl;
+  }
+
+  // Method to get the current server type
+  getServerType() {
+    return this.serverType;
+  }
+
+  // Get the appropriate endpoint for the current server type
+  private getEndpoint(path: string): string {
+    if (this.serverType === 'mcp-handler') {
+      // mcp-handler uses /mcp for all endpoints
+      return `${this.baseUrl}/mcp`;
+    } else {
+      // local-http uses specific endpoints
+      return `${this.baseUrl}${path}`;
+    }
+  }
+
   async getServerStatus(): Promise<MCPServerStatus> {
     try {
       // Try to connect to the MCP server
-      const response = await fetch(`${this.baseUrl}/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: AbortSignal.timeout(5000), // 5 second timeout
-      });
+      if (this.serverType === 'mcp-handler') {
+        // mcp-handler expects POST requests with MCP protocol data
+        console.log('Attempting to connect to production MCP server:', `${this.baseUrl}/mcp`);
+        
+        const response = await fetch(`${this.baseUrl}/mcp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/event-stream',
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'initialize',
+            params: {
+              protocolVersion: '2024-11-05',
+              capabilities: {},
+              clientInfo: {
+                name: 'basin-admin-dashboard',
+                version: '1.0.0'
+              }
+            }
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          isRunning: true,
-          port: config.mcp.serverPort,
-          uptime: data.uptime || 'Unknown',
-          connections: data.connections || 0,
-          lastCheck: new Date(),
-        };
+        if (response.ok) {
+          return {
+            isRunning: true,
+            port: 443, // HTTPS port
+            uptime: 'Unknown',
+            connections: 1,
+            lastCheck: new Date(),
+          };
+        } else {
+          return {
+            isRunning: false,
+            port: 443,
+            lastCheck: new Date(),
+            error: `HTTP ${response.status}: ${response.statusText}`,
+          };
+        }
       } else {
-        return {
-          isRunning: false,
-          port: config.mcp.serverPort,
-          lastCheck: new Date(),
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        };
+        // Local HTTP server expects GET requests
+        const response = await fetch(`${this.baseUrl}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/event-stream',
+          },
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            isRunning: true,
+            port: config.mcp.serverPort,
+            uptime: data.uptime || 'Unknown',
+            connections: data.connections || 0,
+            lastCheck: new Date(),
+          };
+        } else {
+          return {
+            isRunning: false,
+            port: config.mcp.serverPort,
+            lastCheck: new Date(),
+            error: `HTTP ${response.status}: ${response.statusText}`,
+          };
+        }
       }
     } catch (error) {
+      console.error('MCP Server Status Error:', error);
       return {
         isRunning: false,
-        port: config.mcp.serverPort,
+        port: this.serverType === 'mcp-handler' ? 443 : config.mcp.serverPort,
         lastCheck: new Date(),
         error: error instanceof Error ? error.message : 'Connection failed',
       };
@@ -76,28 +156,68 @@ export class MCPService {
 
   async getAvailableTools(): Promise<MCPTool[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/tools`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: AbortSignal.timeout(5000),
-      });
+      if (this.serverType === 'mcp-handler') {
+        // mcp-handler expects POST requests with MCP protocol data
+        const response = await fetch(`${this.baseUrl}/mcp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/event-stream',
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            method: 'tools/list',
+            params: {}
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        return data.tools || [];
+        if (response.ok) {
+          const data = await response.json();
+          // Convert MCP tools format to our format
+          if (data.result && data.result.tools) {
+            return data.result.tools.map((tool: any) => ({
+              name: tool.name,
+              description: tool.description,
+              parameters: tool.inputSchema?.properties || {}
+            }));
+          }
+          return [];
+        }
+        return [];
+      } else {
+        // Local HTTP server expects GET requests
+        const response = await fetch(`${this.baseUrl}/tools`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/event-stream',
+          },
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.tools || [];
+        }
+        return [];
       }
-      return [];
     } catch (error) {
       console.error('Failed to fetch MCP tools:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        serverType: this.serverType,
+        baseUrl: this.baseUrl
+      });
       return [];
     }
   }
 
   async getAvailableModels(): Promise<MCPModel[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/models`, {
+      const endpoint = this.serverType === 'mcp-handler' ? '/mcp' : '/models';
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +238,8 @@ export class MCPService {
 
   async getAvailableResources(): Promise<MCPResource[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/resources`, {
+      const endpoint = this.serverType === 'mcp-handler' ? '/mcp' : '/resources';
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
