@@ -19,8 +19,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown } from "lucide-react"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -501,7 +499,7 @@ export function CollectionDataTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -552,81 +550,32 @@ export function CollectionDataTable({
         </div>
       </div>
 
-      {/* Schema Display */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Collection Schema</CardTitle>
-          <CardDescription>
-            Field definitions and validation rules for {displayName}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
-                <span>View Schema ({columns.length} fields)</span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {columns.map(column => {
-                    const fieldConfig = fieldConfigs?.find(field => field.key === column.key)
-                    return (
-                      <div key={column.key} className="border rounded-lg p-3">
-                        <div className="font-medium text-sm">{column.key}</div>
-                        <div className="text-xs text-muted-foreground">{column.label}</div>
-                        {fieldConfig && (
-                          <div className="mt-2 space-y-1">
-                            <div className="text-xs">
-                              <span className="font-medium">Type:</span> {fieldConfig.type}
-                            </div>
-                            {fieldConfig.required && (
-                              <div className="text-xs text-red-600">
-                                <span className="font-medium">Required</span>
-                              </div>
-                            )}
-                            {fieldConfig.minLength && (
-                              <div className="text-xs">
-                                <span className="font-medium">Min:</span> {fieldConfig.minLength}
-                              </div>
-                            )}
-                            {fieldConfig.maxLength && (
-                              <div className="text-xs">
-                                <span className="font-medium">Max:</span> {fieldConfig.maxLength}
-                              </div>
-                            )}
-                            {fieldConfig.options && fieldConfig.options.length > 0 && (
-                              <div className="text-xs">
-                                <span className="font-medium">Options:</span> {fieldConfig.options.join(', ')}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-                
-                {/* Concise Debug Info */}
-                <div className="p-3 bg-muted rounded text-xs">
-                  <div><strong>Schema Info:</strong></div>
-                  <div>Fields: {columns.length} | Configs: {fieldConfigs?.length || 0} | Schema: {propSchema ? '✅' : '❌'}</div>
-                  <div className="mt-2"><strong>Columns:</strong></div>
-                  <div className="text-xs font-mono">
-                    {columns.map(col => `${col.key} (${col.label})`).join(', ')}
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </CardContent>
-      </Card>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardContent className="pt-6">
+      {/* Data Table */}
+      <Card className="w-full max-w-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Data Table</CardTitle>
+              <CardDescription>
+                View and manage your {displayName.toLowerCase()} records
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">{sortedData.length}</span> total items
+                {filterText && (
+                  <span> • <span className="font-medium">{filteredData.length}</span> filtered</span>
+                )}
+                {sortConfig && (
+                  <span> • Sorted by <span className="font-medium">{sortConfig.key}</span></span>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Filters and Search */}
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -642,51 +591,20 @@ export function CollectionDataTable({
               Filters
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Data Summary */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <span className="font-medium">{sortedData.length}</span> total items
-              </div>
-              {filterText && (
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">{filteredData.length}</span> filtered results
-                </div>
-              )}
-              {sortConfig && (
-                <div className="text-sm text-muted-foreground">
-                  Sorted by <span className="font-medium">{sortConfig.key}</span> 
-                  ({sortConfig.direction === 'asc' ? 'ascending' : 'descending'})
-                </div>
-              )}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Data Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="rounded-md border">
-            <div className="relative w-full overflow-auto">
-              <table className="w-full caption-bottom text-sm">
+          {/* Data Table */}
+          <div className="rounded-md border overflow-hidden">
+            <div className="relative w-full overflow-x-auto">
+              <table className="w-full caption-bottom text-sm table-auto whitespace-nowrap">
                 <thead className="[&_tr]:border-b">
                   <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                     {columns.map((column) => (
                       <th
                         key={column.key}
-                        className={`h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] ${
+                        className={`h-10 px-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] ${
                           column.sortable ? 'cursor-pointer hover:text-foreground' : ''
                         }`}
-                        style={{ width: column.width }}
+
                         onClick={() => column.sortable && handleSort(column.key)}
                       >
                         <div className="flex items-center gap-1">
@@ -713,12 +631,12 @@ export function CollectionDataTable({
                       {columns.map((column) => (
                         <td
                           key={column.key}
-                          className="p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+                          className="px-3 py-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
                         >
                           {renderCellValue(column, item)}
                         </td>
                       ))}
-                      <td className="p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]">
+                      <td className="px-3 py-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">

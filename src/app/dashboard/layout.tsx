@@ -17,14 +17,14 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col min-h-screen w-full max-w-full overflow-hidden">
         {/* Sticky Header */}
         <div className="sticky top-0 z-50 bg-background border-b">
           <SiteHeader />
         </div>
         
         {/* Main content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-full min-w-0 overflow-hidden">
           <AuthGuard>
             {children}
           </AuthGuard>

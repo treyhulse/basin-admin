@@ -57,13 +57,18 @@ const formatColumnLabel = (key: string): string => {
 
 // Determine column width based on key and value type
 const getColumnWidth = (key: string, value: any): string => {
-  if (key === 'id') return '80px'
-  if (typeof value === 'boolean') return '100px'
-  if (typeof value === 'number') return '120px'
-  if (key.includes('date') || key.includes('created') || key.includes('updated')) return '140px'
-  if (key.includes('email')) return '200px'
-  if (key.includes('name')) return '150px'
-  return 'auto'
+  // Use percentage-based widths that add up to 100%
+  if (key === 'id') return '8%'
+  if (key === 'actions') return '6%'
+  if (typeof value === 'boolean') return '8%'
+  if (typeof value === 'number') return '10%'
+  if (key.includes('date') || key.includes('created') || key.includes('updated')) return '12%'
+  if (key.includes('email')) return '18%'
+  if (key.includes('name')) return '15%'
+  if (key.includes('description')) return '20%'
+  if (key.includes('url') || key.includes('link')) return '18%'
+  // Default width for other columns
+  return '12%'
 }
 
 export function CollectionDataTableWrapper({ 
@@ -208,7 +213,7 @@ export function CollectionDataTableWrapper({
   }
 
   return (
-    <>
+    <div className="w-full max-w-full overflow-hidden">
       <CollectionDataTable
         collectionName={collectionName}
         displayName={displayName}
@@ -228,6 +233,6 @@ export function CollectionDataTableWrapper({
         open={isSchemaOpen}
         onOpenChange={setIsSchemaOpen}
       />
-    </>
+    </div>
   )
 }

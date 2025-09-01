@@ -122,7 +122,8 @@ export function useSchemaManagement({
           isLoading: false
         }))
         
-        onSuccess?.(response.message || 'Schema refreshed successfully')
+        // Don't show success toast for schema loading - it's automatic
+        // onSuccess?.(response.message || 'Schema refreshed successfully')
       } else {
         setState(prev => ({
           ...prev,
@@ -130,7 +131,8 @@ export function useSchemaManagement({
           isLoading: false
         }))
         
-        onError?.(response.message || 'Failed to refresh schema')
+        // Don't show error toast for schema loading errors - they're handled by UI state
+        // onError?.(response.message || 'Failed to refresh schema')
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
@@ -140,7 +142,8 @@ export function useSchemaManagement({
         isLoading: false
       }))
       
-      onError?.(errorMessage)
+      // Don't show error toast for schema loading errors - they're handled by UI state
+      // onError?.(errorMessage)
     }
   }, [collectionId, service, onSuccess, onError])
   

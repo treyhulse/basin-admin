@@ -88,6 +88,12 @@ export function NavMain({
     url: `/dashboard/data/${collection.name.toLowerCase()}`
   }))
 
+  // Add 'All Collections' option at the top
+  const allCollectionsItem = {
+    title: "All Collections",
+    url: "/dashboard/data"
+  }
+
   // Fallback items if no collections are loaded
   const fallbackItems = [
     {
@@ -96,8 +102,10 @@ export function NavMain({
     }
   ]
 
-  // Use collections as navigation items, or fallback if none available
-  const allItems = collectionsItems.length > 0 ? collectionsItems : fallbackItems
+  // Use collections as navigation items with 'All Collections' at the top, or fallback if none available
+  const allItems = collectionsItems.length > 0 
+    ? [allCollectionsItem, ...collectionsItems] 
+    : fallbackItems
 
   return (
     <SidebarGroup>

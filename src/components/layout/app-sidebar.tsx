@@ -13,6 +13,10 @@ import {
   Settings,
   Building2,
   Crown,
+  Users,
+  UserCheck,
+  Shield,
+  ChevronRight,
 } from "lucide-react"
 
 import { NavMain } from "@/components/layout/nav-main"
@@ -30,7 +34,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
@@ -54,26 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         isActive: pathname === "/dashboard/mcp/server",
       },
       {
-        name: "Models",
-        url: "/dashboard/mcp/models",
-        icon: Brain,
-        isActive: pathname.startsWith("/dashboard/mcp/models"),
-        items: [
-          {
-            title: "GPT-4",
-            url: "/dashboard/mcp/models",
-          },
-          {
-            title: "Claude",
-            url: "/dashboard/mcp/models",
-          },
-          {
-            title: "Gemini",
-            url: "/dashboard/mcp/models",
-          },
-        ],
-      },
-      {
         name: "Tools",
         url: "/dashboard/mcp/tools",
         icon: Wrench,
@@ -86,33 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         isActive: pathname === "/dashboard/mcp/agents",
       },
     ],
-    adminTools: [
-      {
-        name: "Users",
-        url: "/dashboard/users",
-        icon: ShieldUser,
-        isActive: pathname === "/dashboard/users",
-      },
-      {
-        name: "Roles & Permissions",
-        url: "/dashboard/roles",
-        icon: Crown,
-        isActive: pathname === "/dashboard/roles",
-      },
-      {
-        name: "Organization",
-        url: "/dashboard/organization",
-        icon: Building2,
-        isActive: pathname === "/dashboard/organization",
-      },
-    ],
     systemTools: [
-      {
-        name: "API Keys",
-        url: "/dashboard/api-keys",
-        icon: KeyRound,
-        isActive: pathname === "/dashboard/api-keys",
-      },
       {
         name: "Settings",
         url: "/dashboard/settings",
@@ -123,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader className="pb-2">
         <SidebarHeaderComponent />
       </SidebarHeader>
@@ -131,20 +97,132 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
         <NavMCP mcpTools={data.mcpTools} />
         
-        {/* Administration Section */}
+        {/* Core System Tables Section */}
         <SidebarGroup>
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupLabel>Core</SidebarGroupLabel>
           <SidebarMenu>
-            {data.adminTools.map((tool) => (
-              <SidebarMenuItem key={tool.name}>
-                <SidebarMenuButton asChild isActive={tool.isActive}>
-                  <a href={tool.url}>
-                    <tool.icon />
-                    <span>{tool.name}</span>
-                  </a>
-                </SidebarMenuButton>
+            {/* Users & Access Group */}
+            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/users") || pathname.startsWith("/dashboard/roles") || pathname.startsWith("/dashboard/permissions") || pathname.startsWith("/dashboard/user-roles")}>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Users & Access">
+                    <Users />
+                    <span>Users & Access</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/users")}>
+                        <a href="/dashboard/users">
+                          <Users />
+                          <span>Users</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/roles")}>
+                        <a href="/dashboard/roles">
+                          <Crown />
+                          <span>Roles</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/permissions")}>
+                        <a href="/dashboard/permissions">
+                          <Shield />
+                          <span>Permissions</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/user-roles")}>
+                        <a href="/dashboard/user-roles">
+                          <UserCheck />
+                          <span>User Roles</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
               </SidebarMenuItem>
-            ))}
+            </Collapsible>
+
+            {/* Organization Group */}
+            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/tenants") || pathname.startsWith("/dashboard/user-tenants")}>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Organization">
+                    <Building2 />
+                    <span>Organization</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/tenants")}>
+                        <a href="/dashboard/tenants">
+                          <Building2 />
+                          <span>Tenants</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/user-tenants")}>
+                        <a href="/dashboard/user-tenants">
+                          <UserCheck />
+                          <span>User Tenants</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+
+            {/* Data Management Group */}
+            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/collections") || pathname.startsWith("/dashboard/fields") || pathname.startsWith("/dashboard/api-keys")}>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Data Management">
+                    <Database />
+                    <span>Data Management</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/collections")}>
+                        <a href="/dashboard/collections">
+                          <Database />
+                          <span>Collections</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/fields")}>
+                        <a href="/dashboard/fields">
+                          <Settings />
+                          <span>Fields</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/api-keys")}>
+                        <a href="/dashboard/api-keys">
+                          <KeyRound />
+                          <span>API Keys</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
         </SidebarGroup>
 

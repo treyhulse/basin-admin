@@ -127,12 +127,6 @@ export function NavMCP({
             </SidebarMenuItem>
           </Collapsible>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <SquarePlus className="text-sidebar-foreground/70" />
-            <span>Add MCP Tool</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   )
