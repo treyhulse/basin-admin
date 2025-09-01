@@ -150,10 +150,10 @@ export class MCPService {
   getSimulatedStats() {
     return {
       tools: [
-        { name: 'echo', description: 'Echo back the input text' },
-        { name: 'now', description: 'Get current timestamp' },
-        { name: 'read_file', description: 'Read a file from the repository' },
-        { name: 'get_collection_stats', description: 'Get statistics about data collections' },
+        { name: 'echo', description: 'Echo back the input text', parameters: {} },
+        { name: 'now', description: 'Get current timestamp', parameters: {} },
+        { name: 'read_file', description: 'Read a file from the repository', parameters: {} },
+        { name: 'get_collection_stats', description: 'Get statistics about data collections', parameters: {} },
       ],
       models: [
         { name: 'GPT-4', description: 'OpenAI GPT-4 model', capabilities: ['text-generation', 'reasoning'] },
