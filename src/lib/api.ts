@@ -12,7 +12,29 @@ export const api: AxiosInstance = axios.create({
   timeout: config.api.timeout,
 });
 
-// Request interceptor to add auth token and logging
+/**
+ * Next.js API Client
+ * 
+ * A separate axios instance specifically designed for making authenticated requests
+ * to Next.js API routes (e.g., /api/fields, /api/collections). This client:
+ * 
+ * - Uses relative URLs to work with Next.js API routes
+ * - Automatically includes authentication headers from cookies
+ * - Provides the same logging and error handling as the main API client
+ * - Is used by services that need to call Next.js API routes instead of direct backend calls
+ * 
+ * @example
+ * ```typescript
+ * // Make authenticated request to Next.js API route
+ * const response = await nextApi.get('/api/fields?name=customers')
+ * ```
+ */
+export const nextApi: AxiosInstance = axios.create({
+  baseURL: '', // Use relative URLs for Next.js API routes
+  timeout: config.api.timeout,
+});
+
+// Request interceptor for backend API
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const requestId = generateRequestId();
@@ -23,6 +45,7 @@ api.interceptors.request.use(
     (config as any).startTime = startTime;
     
     const token = getAuthToken();
+    
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -45,6 +68,53 @@ api.interceptors.request.use(
   },
   (error) => {
     logger.error('Request interceptor error', undefined, error);
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Request Interceptor for Next.js API Routes
+ * 
+ * Automatically adds authentication headers and logging to all requests made
+ * through the nextApi client. This ensures that:
+ * 
+ * - Authentication tokens are included from client-side cookies
+ * - All requests are logged for debugging and monitoring
+ * - Request metadata is tracked for performance analysis
+ */
+nextApi.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const requestId = generateRequestId();
+    const startTime = Date.now();
+    
+    // Store request metadata for response logging
+    (config as any).requestId = requestId;
+    (config as any).startTime = startTime;
+    
+    const token = getAuthToken();
+    
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    const logContext: LogContext = {
+      requestId,
+      endpoint: config.url,
+      method: config.method?.toUpperCase(),
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
+    };
+    
+    logApi(`Next.js API Request started: ${config.method?.toUpperCase()} ${config.url}`, logContext, {
+      headers: config.headers,
+      data: config.data,
+      params: config.params,
+    });
+    
+    return config;
+  },
+  (error) => {
+    logger.error('Next.js API Request interceptor error', undefined, error);
     return Promise.reject(error);
   }
 );
@@ -440,6 +510,10 @@ export const collectionsAPI = {
   },
   get: async (id: string) => {
     const response = await api.get(`/items/collections/${id}`);
+    return response.data;
+  },
+  getByName: async (name: string) => {
+    const response = await api.get('/items/collections', { params: { name } });
     return response.data;
   },
   create: async (collectionData: {

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Database } from "lucide-react"
 import { CollectionDataTableWrapper } from "@/components/data/collection-data-table-wrapper"
 import { useCollectionCrud } from "@/hooks/use-collection-crud"
 
@@ -43,6 +44,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
   return (
     <div className="container mx-auto py-6">
+      {/* Collection Data Table with integrated schema management */}
       <CollectionDataTableWrapper 
         collectionName={collectionName}
         crudActions={actions}

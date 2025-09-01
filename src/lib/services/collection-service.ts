@@ -113,6 +113,32 @@ export class CollectionService {
     }
   }
 
+  // Get collection metadata by name
+  async getCollectionMetadata(): Promise<ApiResponse<any>> {
+    try {
+      console.log(`CollectionService: Fetching metadata for ${this.collectionName}`)
+      
+      const response = await collectionsAPI.getByName(this.collectionName)
+      const collection = response.data?.[0] // getByName returns an array, take first match
+      
+      if (!collection) {
+        return {
+          data: null,
+          success: false,
+          message: 'Collection not found'
+        }
+      }
+      
+      return {
+        data: collection,
+        success: true,
+        message: 'Collection metadata retrieved successfully'
+      }
+    } catch (error) {
+      return this.handleError(error, 'Failed to retrieve collection metadata')
+    }
+  }
+
   // Get collection schema/metadata
   async getSchema(): Promise<ApiResponse<any>> {
     try {

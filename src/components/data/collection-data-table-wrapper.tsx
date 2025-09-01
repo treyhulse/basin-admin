@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { CollectionDataTable, type DataColumn } from "./collection-data-table"
+import { SchemaSheet } from "./schema-sheet"
 import { CollectionService } from "@/lib/services/collection-service"
 import { 
   generateCollectionSchema, 
@@ -79,6 +80,8 @@ export function CollectionDataTableWrapper({
   const [displayName, setDisplayName] = useState<string>("")
   const [formFields, setFormFields] = useState<any[]>([])
   const [formSchema, setFormSchema] = useState<any>(null)
+  const [collectionId, setCollectionId] = useState<string>("")
+  const [isSchemaOpen, setIsSchemaOpen] = useState(false)
 
   // Single useEffect that handles everything
   useEffect(() => {
@@ -100,6 +103,19 @@ export function CollectionDataTableWrapper({
         const service = new CollectionService({ collectionName })
         const response = await service.list({ limit: 1 })
         const data = response.data || []
+        
+        // Try to get collection ID from the collection service
+        try {
+          const metadataResponse = await service.getCollectionMetadata()
+          if (metadataResponse.success && metadataResponse.data?.id) {
+            setCollectionId(metadataResponse.data.id)
+            console.log('CollectionDataTableWrapper: Found collection ID:', metadataResponse.data.id)
+          } else {
+            console.log('CollectionDataTableWrapper: No collection ID found, will use name as fallback')
+          }
+        } catch (error) {
+          console.log('CollectionDataTableWrapper: Could not fetch collection ID, will use name as fallback:', error)
+        }
         
         let generatedColumns: DataColumn[]
         if (data.length > 0) {
@@ -192,14 +208,26 @@ export function CollectionDataTableWrapper({
   }
 
   return (
-    <CollectionDataTable
-      collectionName={collectionName}
-      displayName={displayName}
-      columns={columns}
-      schema={formSchema}
-      fieldConfigs={formFields}
-      crudActions={crudActions}
-      crudState={crudState}
-    />
+    <>
+      <CollectionDataTable
+        collectionName={collectionName}
+        displayName={displayName}
+        columns={columns}
+        schema={formSchema}
+        fieldConfigs={formFields}
+        crudActions={crudActions}
+        crudState={crudState}
+        collectionId={collectionId}
+        onSchemaOpen={() => setIsSchemaOpen(true)}
+      />
+      
+      {/* Schema Management Sheet */}
+      <SchemaSheet
+        collectionId={collectionId || collectionName}
+        collectionName={collectionName}
+        open={isSchemaOpen}
+        onOpenChange={setIsSchemaOpen}
+      />
+    </>
   )
 }
