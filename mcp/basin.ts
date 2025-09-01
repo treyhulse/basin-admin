@@ -4,7 +4,7 @@ import axios from "axios";
 
 // Basin API configuration
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://basin-backend-production.up.railway.app";
-const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_775ec68995f39c5ca095e5cf3da848146a8d7a7a62d080063cfad0552114a994";
+const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_24b15f4e520c747870e4c3aec89cd44cd322dba0074b654cee88009691d4a228";
 
 // Create authenticated API client
 const basinAPI = axios.create({
