@@ -24,39 +24,39 @@ console.log('MCP: Config loaded:', {
 
 const handler = createMcpHandler(
   async (server) => {
-    // Test API connection
-    server.tool(
-      "testAPIConnection",
-      "Test the API connection and authentication",
-      {},
-      async () => {
-        try {
-          console.log('MCP: Testing API connection...');
-          const response = await authenticatedAPI.get('/health');
-          console.log('MCP: Test response:', response.status, response.data);
-          
-          return {
-            content: [
-              { 
-                type: "text", 
-                text: `✅ Basin API connection successful!\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(response.data, null, 2)}`
-              }
-            ]
-          };
-        } catch (error: any) {
-          console.error('MCP: API connection test failed:', error);
-          
-                                           return {
-              content: [
-                { 
-                  type: "text", 
-                  text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
-                }
-              ]
-            };
-        }
-      }
-    );
+         // API health check
+     server.tool(
+       "APIHealthCheck",
+       "Check the health and connection status of the Basin API",
+       {},
+       async () => {
+         try {
+           console.log('MCP: Checking API health...');
+           const response = await authenticatedAPI.get('/health');
+           console.log('MCP: Health check response:', response.status, response.data);
+           
+           return {
+             content: [
+               { 
+                 type: "text", 
+                 text: `✅ Basin API health check successful!\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(response.data, null, 2)}`
+               }
+             ]
+           };
+         } catch (error: any) {
+           console.error('MCP: API health check failed:', error);
+           
+                                            return {
+               content: [
+                 { 
+                   type: "text", 
+                   text: `❌ Basin API health check failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+                 }
+               ]
+             };
+         }
+       }
+     );
 
         // List collections
     server.tool(
@@ -90,9 +90,179 @@ const handler = createMcpHandler(
           };
         }
       }
-    );
+         );
 
-    // Get collection by ID
+     // List fields
+     server.tool(
+       "listFields",
+       "List all fields with optional filtering and pagination",
+       {},
+       async () => {
+         try {
+           console.log('MCP: Testing listFields request (no params)');
+           const response = await authenticatedAPI.get('/items/fields');
+           const fields = response.data.data || response.data;
+           const meta = response.data.meta;
+           
+           return {
+             content: [
+               {
+                 type: "text",
+                 text: `✅ List fields successful!\n\nStatus: ${response.status}\nFields found: ${fields?.length || 0}\n\nFields:\n${fields?.map((f: any) => `- ${f.display_name || f.name}: ${f.description || 'No description'} (Type: ${f.type || 'Unknown'})`).join('\n') || 'No fields found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+               }
+             ]
+           };
+         } catch (error) {
+           console.error('MCP: List fields failed:', error);
+           return {
+             content: [
+               {
+                 type: "text",
+                 text: `❌ List fields failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+               }
+             ]
+           };
+         }
+       }
+           );
+
+      // List permissions
+      server.tool(
+        "listPermissions",
+        "List all permissions with optional filtering and pagination",
+        {},
+        async () => {
+          try {
+            console.log('MCP: Testing listPermissions request (no params)');
+            const response = await authenticatedAPI.get('/items/permissions');
+            const permissions = response.data.data || response.data;
+            const meta = response.data.meta;
+            
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `✅ List permissions successful!\n\nStatus: ${response.status}\nPermissions found: ${permissions?.length || 0}\n\nPermissions:\n${permissions?.map((p: any) => `- ${p.display_name || p.name}: ${p.description || 'No description'} (Action: ${p.action || 'Unknown'})`).join('\n') || 'No permissions found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+                }
+              ]
+            };
+          } catch (error) {
+            console.error('MCP: List permissions failed:', error);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `❌ List permissions failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+                }
+              ]
+            };
+          }
+        }
+      );
+
+      // List roles
+      server.tool(
+        "listRoles",
+        "List all roles with optional filtering and pagination",
+        {},
+        async () => {
+          try {
+            console.log('MCP: Testing listRoles request (no params)');
+            const response = await authenticatedAPI.get('/items/roles');
+            const roles = response.data.data || response.data;
+            const meta = response.data.meta;
+            
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `✅ List roles successful!\n\nStatus: ${response.status}\nRoles found: ${roles?.length || 0}\n\nRoles:\n${roles?.map((r: any) => `- ${r.display_name || r.name}: ${r.description || 'No description'} (Level: ${r.level || 'Unknown'})`).join('\n') || 'No roles found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+                }
+              ]
+            };
+          } catch (error) {
+            console.error('MCP: List roles failed:', error);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `❌ List roles failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+                }
+              ]
+            };
+          }
+        }
+      );
+
+      // List users
+      server.tool(
+        "listUsers",
+        "List all users with optional filtering and pagination",
+        {},
+        async () => {
+          try {
+            console.log('MCP: Testing listUsers request (no params)');
+            const response = await authenticatedAPI.get('/items/users');
+            const users = response.data.data || response.data;
+            const meta = response.data.meta;
+            
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `✅ List users successful!\n\nStatus: ${response.status}\nUsers found: ${users?.length || 0}\n\nUsers:\n${users?.map((u: any) => `- ${u.display_name || u.name || u.email}: ${u.email || 'No email'} (Status: ${u.status || 'Unknown'})`).join('\n') || 'No users found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+                }
+              ]
+            };
+          } catch (error) {
+            console.error('MCP: List users failed:', error);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `❌ List users failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+                }
+              ]
+            };
+          }
+        }
+      );
+
+      // List tenants
+      server.tool(
+        "listTenants",
+        "List all tenants with optional filtering and pagination",
+        {},
+        async () => {
+          try {
+            console.log('MCP: Testing listTenants request (no params)');
+            const response = await authenticatedAPI.get('/items/tenants');
+            const tenants = response.data.data || response.data;
+            const meta = response.data.meta;
+            
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `✅ List tenants successful!\n\nStatus: ${response.status}\nTenants found: ${tenants?.length || 0}\n\nTenants:\n${tenants?.map((t: any) => `- ${t.display_name || t.name}: ${t.description || 'No description'} (Domain: ${t.domain || 'Unknown'})`).join('\n') || 'No tenants found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+                }
+              ]
+            };
+          } catch (error) {
+            console.error('MCP: List tenants failed:', error);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `❌ List tenants failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
+                }
+              ]
+            };
+          }
+        }
+      );
+
+      // Get collection by ID
     server.tool(
       "getCollection",
       "Get a specific collection by its ID",
@@ -371,8 +541,23 @@ const handler = createMcpHandler(
           description: "Test the API connection and authentication" 
         },
         listCollections: { 
-          description: "List all collections with optional filtering and pagination" 
-        },
+           description: "List all collections with optional filtering and pagination" 
+         },
+        listFields: { 
+            description: "List all fields with optional filtering and pagination" 
+          },
+         listPermissions: { 
+           description: "List all permissions with optional filtering and pagination" 
+         },
+         listRoles: { 
+           description: "List all roles with optional filtering and pagination" 
+         },
+         listUsers: { 
+           description: "List all users with optional filtering and pagination" 
+         },
+         listTenants: { 
+           description: "List all tenants with optional filtering and pagination" 
+         },
         getCollection: { 
           description: "Get a specific collection by its ID" 
         },
@@ -387,9 +572,6 @@ const handler = createMcpHandler(
         },
         bulkCollectionOperations: { 
           description: "Perform bulk operations on collections" 
-        },
-        testCollectionsSimple: { 
-          description: "Test collections endpoint with no parameters" 
         }
       },
     },
