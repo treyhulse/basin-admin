@@ -46,14 +46,14 @@ const handler = createMcpHandler(
         } catch (error: any) {
           console.error('MCP: API connection test failed:', error);
           
-          return {
-            content: [
-              { 
-                type: "text", 
-                text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
-              }
-            ]
-          };
+                                           return {
+              content: [
+                { 
+                  type: "text", 
+                  text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+                }
+              ]
+            };
         }
       }
     );
@@ -73,14 +73,15 @@ const handler = createMcpHandler(
         icon: z.string().optional().describe("Filter by icon"),
         is_primary: z.boolean().optional().describe("Filter by primary status"),
       },
-      async (params) => {
-        try {
-          console.log('MCP: Attempting to list collections with params:', params);
-          console.log('MCP: Using API URL:', `${NEXT_PUBLIC_API_URL}/items/collections`);
-          
-          const response = await authenticatedAPI.get('/items/collections', { params });
-          console.log('MCP: API Response status:', response.status);
-          console.log('MCP: API Response data:', response.data);
+             async (params) => {
+         try {
+           // For now, let's make this work exactly like the simple version
+           // We can add parameter support back later once we understand what the API accepts
+           console.log('MCP: Sending listCollections request (no params for now)');
+           
+           const response = await authenticatedAPI.get('/items/collections');
+           console.log('MCP: API Response status:', response.status);
+           console.log('MCP: API Response data:', response.data);
           
           const collections = response.data.data || response.data;
           const meta = response.data.meta;
@@ -155,6 +156,8 @@ const handler = createMcpHandler(
       },
       async ({ name, description, icon, is_primary, tenant_id }) => {
         try {
+          console.log('MCP: createCollection called with params:', { name, description, icon, is_primary, tenant_id });
+          
           const collectionData = { 
             name, 
             description, 
