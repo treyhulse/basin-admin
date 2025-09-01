@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
 // Basin API configuration - using the working setup from basin.ts
-const BASIN_API_URL = process.env.BASIN_API_URL || "https://basin-backend-production.up.railway.app";
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://basin-backend-production.up.railway.app";
 const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_24b15f4e520c747870e4c3aec89cd44cd322dba0074b654cee88009691d4a228";
 
 // Create authenticated API instance for MCP tools
 const authenticatedAPI = axios.create({
-  baseURL: BASIN_API_URL,
+  baseURL: NEXT_PUBLIC_API_URL,
   headers: {
     Authorization: `Bearer ${BASIN_API_TOKEN}`,
     'Content-Type': 'application/json'
@@ -18,7 +18,7 @@ const authenticatedAPI = axios.create({
 
 // Debug: Log the configuration being used
 console.log('MCP: Config loaded:', {
-  baseURL: BASIN_API_URL,
+  baseURL: NEXT_PUBLIC_API_URL,
   hasToken: !!BASIN_API_TOKEN
 });
 
@@ -50,7 +50,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${BASIN_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+                text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- NEXT_PUBLIC_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
               }
             ]
           };
@@ -76,7 +76,7 @@ const handler = createMcpHandler(
       async (params) => {
         try {
           console.log('MCP: Attempting to list collections with params:', params);
-          console.log('MCP: Using API URL:', `${BASIN_API_URL}/items/collections`);
+          console.log('MCP: Using API URL:', `${NEXT_PUBLIC_API_URL}/items/collections`);
           
           const response = await authenticatedAPI.get('/items/collections', { params });
           console.log('MCP: API Response status:', response.status);
@@ -163,7 +163,7 @@ const handler = createMcpHandler(
             tenant_id: tenant_id || "8da6da20-a5b8-4890-9c88-b004ae1e698d" 
           };
           console.log('MCP: Attempting to create collection with data:', collectionData);
-          console.log('MCP: Using API URL:', `${BASIN_API_URL}/items/collections`);
+          console.log('MCP: Using API URL:', `${NEXT_PUBLIC_API_URL}/items/collections`);
           
           const response = await authenticatedAPI.post('/items/collections', collectionData);
           console.log('MCP: Create Response status:', response.status);
