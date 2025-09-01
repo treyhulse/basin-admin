@@ -2,27 +2,24 @@ import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import { config } from "@/lib/config";
 
-// Hardcoded bearer token for development/testing
-// TODO: This token will expire - you may need to refresh it periodically
-// For production, consider using environment variables or dynamic token generation
-const HARDCODED_AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2E4MDI3ZTMtMTkwZC00MmU4LWI4ZjgtMmUzYmQyMzhjZjdiIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInRlbmFudF9pZCI6IjhkYTZkYTIwLWE1YjgtNDg5MC05Yzg4LWIwMDRhZTFlNjk4ZCIsInRlbmFudF9zbHVnIjoibWFpbiIsInNlc3Npb25faWQiOiI0OWNkMTRkNS03ZTQ1LTQzYjctOTQ2My01YzYwMDMzMTQzNGMiLCJleHAiOjE3NTY3NjY1MDEsIm5iZiI6MTc1NjY4MDEwMSwiaWF0IjoxNzU2NjgwMTAxfQ.gE1HHyBCjdaVLrkD9PXe3tgiMAQB0ZF5nBbq97pNW38";
+// Basin API configuration - using the working setup from basin.ts
+const BASIN_API_URL = process.env.BASIN_API_URL || "https://basin-backend-production.up.railway.app";
+const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_24b15f4e520c747870e4c3aec89cd44cd322dba0074b654cee88009691d4a228";
 
 // Create authenticated API instance for MCP tools
 const authenticatedAPI = axios.create({
-  baseURL: config.api.baseURL,
+  baseURL: BASIN_API_URL,
   headers: {
-    Authorization: `Bearer ${HARDCODED_AUTH_TOKEN}`,
+    Authorization: `Bearer ${BASIN_API_TOKEN}`,
     'Content-Type': 'application/json'
   }
 });
 
 // Debug: Log the configuration being used
 console.log('MCP: Config loaded:', {
-  baseURL: config.api.baseURL,
-  env: config.env,
-  isDevelopment: config.isDevelopment
+  baseURL: BASIN_API_URL,
+  hasToken: !!BASIN_API_TOKEN
 });
 
 const handler = createMcpHandler(
@@ -35,14 +32,14 @@ const handler = createMcpHandler(
       async () => {
         try {
           console.log('MCP: Testing API connection...');
-          const response = await authenticatedAPI.get('/');
+          const response = await authenticatedAPI.get('/health');
           console.log('MCP: Test response:', response.status, response.data);
           
           return {
             content: [
               { 
                 type: "text", 
-                text: `API connection test successful! Status: ${response.status}. Base URL: ${config.api.baseURL}`
+                text: `✅ Basin API connection successful!\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(response.data, null, 2)}`
               }
             ]
           };
@@ -53,7 +50,7 @@ const handler = createMcpHandler(
             content: [
               { 
                 type: "text", 
-                text: `API connection test failed: ${error.message || 'Unknown error'}. Status: ${error.response?.status}. URL: ${config.api.baseURL}`
+                text: `❌ Basin API connection failed!\n\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${BASIN_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
               }
             ]
           };
@@ -79,18 +76,20 @@ const handler = createMcpHandler(
       async (params) => {
         try {
           console.log('MCP: Attempting to list collections with params:', params);
-          console.log('MCP: Using API URL:', `${config.api.baseURL}/items/collections`);
+          console.log('MCP: Using API URL:', `${BASIN_API_URL}/items/collections`);
           
           const response = await authenticatedAPI.get('/items/collections', { params });
           console.log('MCP: API Response status:', response.status);
           console.log('MCP: API Response data:', response.data);
           
-          const collections = response.data;
+          const collections = response.data.data || response.data;
+          const meta = response.data.meta;
+          
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully retrieved ${collections?.length || 0} collections. Response: ${JSON.stringify(collections)}`
+                text: `Successfully retrieved ${collections?.length || 0} collections from Basin API.\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
               }
             ]
           };
@@ -121,12 +120,12 @@ const handler = createMcpHandler(
       async ({ id }) => {
         try {
           const response = await authenticatedAPI.get(`/items/collections/${id}`);
-          const collection = response.data;
+          const collection = response.data.data || response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully retrieved collection: ${collection?.name || 'Unknown'}`
+                text: `Successfully retrieved collection: ${collection.display_name || collection.name}\n\nCollection Details:\n${JSON.stringify(collection, null, 2)}`
               }
             ]
           };
@@ -156,20 +155,26 @@ const handler = createMcpHandler(
       },
       async ({ name, description, icon, is_primary, tenant_id }) => {
         try {
-          const collectionData = { name, description, icon, is_primary, tenant_id };
+          const collectionData = { 
+            name, 
+            description, 
+            icon: icon || "📝", 
+            is_primary: is_primary || false, 
+            tenant_id: tenant_id || "8da6da20-a5b8-4890-9c88-b004ae1e698d" 
+          };
           console.log('MCP: Attempting to create collection with data:', collectionData);
-          console.log('MCP: Using API URL:', `${config.api.baseURL}/items/collections`);
+          console.log('MCP: Using API URL:', `${BASIN_API_URL}/items/collections`);
           
           const response = await authenticatedAPI.post('/items/collections', collectionData);
           console.log('MCP: Create Response status:', response.status);
           console.log('MCP: Create Response data:', response.data);
           
-          const collection = response.data;
+          const collection = response.data.data || response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully created collection: ${collection?.name || 'Unknown'}. Response: ${JSON.stringify(collection)}`
+                text: `Successfully created collection: ${collection.display_name || collection.name}\n\nCollection Details:\n${JSON.stringify(collection, null, 2)}`
               }
             ]
           };
@@ -205,12 +210,12 @@ const handler = createMcpHandler(
       async ({ id, ...updateData }) => {
         try {
           const response = await authenticatedAPI.put(`/items/collections/${id}`, updateData);
-          const collection = response.data;
+          const collection = response.data.data || response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully updated collection: ${collection?.name || 'Unknown'}`
+                text: `Successfully updated collection: ${collection.display_name || collection.name}\n\nUpdated Collection Details:\n${JSON.stringify(collection, null, 2)}`
               }
             ]
           };
@@ -263,51 +268,111 @@ const handler = createMcpHandler(
       "bulkCollectionOperations",
       "Perform bulk operations on collections (create multiple, update multiple, etc.)",
       {
-        operation: z.enum(["create", "update", "delete"]).describe("Type of bulk operation"),
-        collections: z.array(z.object({
-          name: z.string(),
-          description: z.string(),
-          icon: z.string().optional(),
-          is_primary: z.boolean().optional(),
-          tenant_id: z.string().optional(),
-        })).describe("Array of collections for the operation"),
-        ids: z.array(z.string()).optional().describe("Array of IDs for update/delete operations"),
+        operations: z.array(z.object({
+          action: z.enum(["create", "update", "delete"]).describe("Action to perform"),
+          data: z.object({
+            name: z.string().optional(),
+            description: z.string().optional(),
+            icon: z.string().optional(),
+            is_primary: z.boolean().optional(),
+            tenant_id: z.string().optional(),
+          }).describe("Data for the operation"),
+          id: z.string().optional().describe("Collection ID for update/delete operations"),
+        })).describe("Array of operations to perform"),
       },
-      async ({ operation, collections, ids }) => {
+      async ({ operations }) => {
         try {
-          let results = [];
+          console.log('MCP: Performing bulk operations:', operations);
+          const results = [];
           
-          if (operation === "create") {
-            for (const collection of collections) {
-              const response = await authenticatedAPI.post('/items/collections', collection);
-              results.push(response.data);
-            }
-          } else if (operation === "update" && ids) {
-            for (let i = 0; i < ids.length; i++) {
-              const response = await authenticatedAPI.put(`/items/collections/${ids[i]}`, collections[i] || {});
-              results.push(response.data);
-            }
-          } else if (operation === "delete" && ids) {
-            for (const id of ids) {
-              await authenticatedAPI.delete(`/items/collections/${id}`);
-              results.push({ deletedId: id });
+          for (const operation of operations) {
+            try {
+              let response;
+              switch (operation.action) {
+                case 'create':
+                  response = await authenticatedAPI.post('/items/collections', operation.data);
+                  results.push({ action: 'create', success: true, data: response.data.data || response.data });
+                  break;
+                case 'update':
+                  if (!operation.id) {
+                    results.push({ action: 'update', success: false, error: 'ID required for update' });
+                    continue;
+                  }
+                  response = await authenticatedAPI.put(`/items/collections/${operation.id}`, operation.data);
+                  results.push({ action: 'update', success: true, data: response.data.data || response.data });
+                  break;
+                case 'delete':
+                  if (!operation.id) {
+                    results.push({ action: 'delete', success: false, error: 'ID required for delete' });
+                    continue;
+                  }
+                  await authenticatedAPI.delete(`/items/collections/${operation.id}`);
+                  results.push({ action: 'delete', success: true, id: operation.id });
+                  break;
+                default:
+                  results.push({ action: operation.action, success: false, error: 'Unknown action' });
+              }
+            } catch (error) {
+              results.push({ 
+                action: operation.action, 
+                success: false, 
+                error: error instanceof Error ? error.message : 'Unknown error' 
+              });
             }
           }
+          
+          const successCount = results.filter(r => r.success).length;
+          const totalCount = results.length;
           
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully completed bulk ${operation} operation on ${results.length} collections`
+                text: `Bulk operations completed. ${successCount}/${totalCount} operations succeeded.\n\nResults:\n${JSON.stringify(results, null, 2)}`
               }
             ]
           };
         } catch (error) {
+          console.error('MCP: Error in bulk operations:', error);
           return {
             content: [
               { 
                 type: "text", 
-                text: `Error in bulk ${operation} operation: ${error instanceof Error ? error.message : 'Unknown error'}`
+                text: `Error in bulk operations: ${error instanceof Error ? error.message : 'Unknown error'}`
+              }
+            ]
+          };
+        }
+      }
+    );
+
+    // Simple collections test tool (no parameters)
+    server.tool(
+      "testCollectionsSimple",
+      "Test collections endpoint with no parameters (like your working curl command)",
+      {},
+      async () => {
+        try {
+          console.log('MCP: Testing simple collections request (no params)');
+          const response = await authenticatedAPI.get('/items/collections');
+          const collections = response.data.data || response.data;
+          const meta = response.data.meta;
+          
+          return {
+            content: [
+              {
+                type: "text",
+                text: `✅ Simple collections request successful!\n\nStatus: ${response.status}\nCollections found: ${collections?.length || 0}\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+              }
+            ]
+          };
+        } catch (error) {
+          console.error('MCP: Simple collections test failed:', error);
+          return {
+            content: [
+              {
+                type: "text",
+                text: `❌ Simple collections request failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
@@ -338,6 +403,9 @@ const handler = createMcpHandler(
         },
         bulkCollectionOperations: { 
           description: "Perform bulk operations on collections" 
+        },
+        testCollectionsSimple: { 
+          description: "Test collections endpoint with no parameters" 
         }
       },
     },
