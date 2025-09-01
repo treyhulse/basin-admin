@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Play } from "lucide-react"
+import Link from "next/link"
 
 export function DemoSection() {
   return (
@@ -33,9 +34,9 @@ export function DemoSection() {
           {/* CTA */}
           <div className="mt-12">
             <Button size="lg" asChild>
-              <a href="/login">
+              <Link href="/login">
                 Start Building Today
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
