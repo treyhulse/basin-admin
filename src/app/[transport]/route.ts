@@ -58,52 +58,33 @@ const handler = createMcpHandler(
       }
     );
 
-    // List collections
+        // List collections
     server.tool(
       "listCollections",
       "List all collections with optional filtering and pagination",
-      {
-        limit: z.number().optional().describe("Number of collections to return"),
-        offset: z.number().optional().describe("Number of collections to skip"),
-        page: z.number().optional().describe("Page number for pagination"),
-        per_page: z.number().optional().describe("Collections per page"),
-        sort: z.string().optional().describe("Field to sort by"),
-        order: z.enum(["asc", "desc"]).optional().describe("Sort order"),
-        name: z.string().optional().describe("Filter by collection name"),
-        icon: z.string().optional().describe("Filter by icon"),
-        is_primary: z.boolean().optional().describe("Filter by primary status"),
-      },
-             async (params) => {
-         try {
-           // For now, let's make this work exactly like the simple version
-           // We can add parameter support back later once we understand what the API accepts
-           console.log('MCP: Sending listCollections request (no params for now)');
-           
-           const response = await authenticatedAPI.get('/items/collections');
-           console.log('MCP: API Response status:', response.status);
-           console.log('MCP: API Response data:', response.data);
-          
+      {},
+      async () => {
+        try {
+          console.log('MCP: Testing listCollections request (no params)');
+          const response = await authenticatedAPI.get('/items/collections');
           const collections = response.data.data || response.data;
           const meta = response.data.meta;
           
           return {
             content: [
-              { 
-                type: "text", 
-                text: `Successfully retrieved ${collections?.length || 0} collections from Basin API.\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+              {
+                type: "text",
+                text: `✅ List collections successful!\n\nStatus: ${response.status}\nCollections found: ${collections?.length || 0}\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
               }
             ]
           };
-        } catch (error: any) {
-          console.error('MCP: Error listing collections:', error);
-          console.error('MCP: Error response:', error.response?.data);
-          console.error('MCP: Error status:', error.response?.status);
-          
+        } catch (error) {
+          console.error('MCP: List collections failed:', error);
           return {
             content: [
-              { 
-                type: "text", 
-                text: `Error listing collections: ${error.message || 'Unknown error'}. Status: ${error.response?.status}. Response: ${JSON.stringify(error.response?.data)}`
+              {
+                type: "text",
+                text: `❌ List collections failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
               }
             ]
           };
