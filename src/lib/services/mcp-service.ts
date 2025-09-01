@@ -7,8 +7,6 @@ export interface MCPServerStatus {
   connections?: number;
   lastCheck: Date;
   error?: string;
-  environment?: 'development' | 'production' | 'external';
-  serverUrl?: string;
 }
 
 export interface MCPTool {
@@ -32,18 +30,9 @@ export interface MCPResource {
 export class MCPService {
   private baseUrl: string;
   private healthCheckInterval: number;
-  private isProduction: boolean;
 
   constructor() {
-    this.isProduction = config.mcp.isProduction;
-    
-    // Use production URL if available, otherwise fall back to development
-    if (this.isProduction && config.mcp.productionServerUrl) {
-      this.baseUrl = config.mcp.productionServerUrl;
-    } else {
-      this.baseUrl = config.mcp.serverUrl;
-    }
-    
+    this.baseUrl = config.mcp.serverUrl;
     this.healthCheckInterval = config.mcp.healthCheckInterval;
   }
 
@@ -66,8 +55,6 @@ export class MCPService {
           uptime: data.uptime || 'Unknown',
           connections: data.connections || 0,
           lastCheck: new Date(),
-          environment: this.isProduction ? 'production' : 'development',
-          serverUrl: this.baseUrl,
         };
       } else {
         return {
@@ -75,8 +62,6 @@ export class MCPService {
           port: config.mcp.serverPort,
           lastCheck: new Date(),
           error: `HTTP ${response.status}: ${response.statusText}`,
-          environment: this.isProduction ? 'production' : 'development',
-          serverUrl: this.baseUrl,
         };
       }
     } catch (error) {
@@ -85,8 +70,6 @@ export class MCPService {
         port: config.mcp.serverPort,
         lastCheck: new Date(),
         error: error instanceof Error ? error.message : 'Connection failed',
-        environment: this.isProduction ? 'production' : 'development',
-        serverUrl: this.baseUrl,
       };
     }
   }
@@ -161,16 +144,6 @@ export class MCPService {
     } catch {
       return false;
     }
-  }
-
-  // Get server information for display
-  getServerInfo() {
-    return {
-      isProduction: this.isProduction,
-      serverUrl: this.baseUrl,
-      environment: this.isProduction ? 'production' : 'development',
-      fallbackEnabled: config.mcp.fallbackEnabled,
-    };
   }
 
   // Simulate MCP server stats for development when server is not running

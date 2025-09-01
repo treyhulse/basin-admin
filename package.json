@@ -9,7 +9,7 @@
     "lint": "next lint",
     "update-api": "node scripts/update-api.js",
     "generate-types": "openapi-typescript ./src/lib/openapi.json -o ./src/lib/api-types.ts",
-    "mcp:dev": "tsx mcp/basin.ts",
+    "mcp:dev": "next dev --turbopack",
     "mcp:http": "tsx mcp/basin.ts",
     "mcp:build": "tsc -p . && node dist/mcp/basin.js",
     "mcp:inspect": "npx @modelcontextprotocol/inspector"
@@ -40,6 +40,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "redis": "^5.8.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Cpu, Brain, Bot, RefreshCw, AlertCircle, CheckCircle, XCircle, Globe, Server } from "lucide-react";
+import { Cpu, Brain, Bot, RefreshCw, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { mcpService, MCPServerStatus, MCPTool, MCPModel, MCPResource } from "@/lib/services/mcp-service";
 import { config } from "@/lib/config";
 
@@ -15,7 +15,6 @@ export default function MCPDashboardClient() {
   const [resources, setResources] = useState<MCPResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  const [serverInfo, setServerInfo] = useState(mcpService.getServerInfo());
 
   const refreshData = async () => {
     setIsLoading(true);
@@ -32,14 +31,13 @@ export default function MCPDashboardClient() {
       setModels(modelsData);
       setResources(resourcesData);
       setLastRefresh(new Date());
-      setServerInfo(mcpService.getServerInfo());
     } catch (error) {
       console.error('Failed to refresh MCP data:', error);
       // Fallback to simulated data if server is not available
       const simulatedStats = mcpService.getSimulatedStats();
-      setTools(simulatedStats.tools as MCPTool[]);
-      setModels(simulatedStats.models as MCPModel[]);
-      setResources(simulatedStats.resources as MCPResource[]);
+      setTools(simulatedStats.tools);
+      setModels(simulatedStats.models);
+      setResources(simulatedStats.resources);
       
       // Set server status as not running
       setServerStatus({
@@ -47,8 +45,6 @@ export default function MCPDashboardClient() {
         port: config.mcp.serverPort,
         lastCheck: new Date(),
         error: 'Server not available, showing simulated data',
-        environment: serverInfo.environment as 'development' | 'production' | 'external',
-        serverUrl: serverInfo.serverUrl,
       });
     } finally {
       setIsLoading(false);
@@ -76,17 +72,6 @@ export default function MCPDashboardClient() {
       return <Badge variant="default" className="bg-green-100 text-green-800">Active</Badge>;
     }
     return <Badge variant="destructive">Inactive</Badge>;
-  };
-
-  const getEnvironmentBadge = (environment?: string) => {
-    switch (environment) {
-      case 'production':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800">Production</Badge>;
-      case 'development':
-        return <Badge variant="secondary">Development</Badge>;
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
   };
 
   const formatUptime = (uptime?: string) => {
@@ -127,39 +112,6 @@ export default function MCPDashboardClient() {
         </Button>
       </div>
 
-      {/* Environment and Server Info */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Environment</CardTitle>
-            <Globe className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-2">
-              {getEnvironmentBadge(serverInfo.environment)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {serverInfo.isProduction ? 'Production deployment' : 'Development mode'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Server URL</CardTitle>
-            <Server className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm font-mono text-xs break-all">
-              {serverInfo.serverUrl}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {serverInfo.isProduction ? 'External MCP server' : 'Local development server'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       {serverStatus && (
         <div className="rounded-lg border bg-yellow-50 p-4">
           <div className="flex items-center gap-2">
@@ -170,11 +122,6 @@ export default function MCPDashboardClient() {
           </div>
           {serverStatus.error && (
             <p className="mt-1 text-sm text-yellow-700">{serverStatus.error}</p>
-          )}
-          {serverInfo.fallbackEnabled && !serverStatus.isRunning && (
-            <p className="mt-1 text-sm text-yellow-700">
-              Showing simulated data while server is unavailable
-            </p>
           )}
         </div>
       )}

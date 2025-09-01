@@ -11,10 +11,6 @@ export const config = {
     serverPort: parseInt(process.env.NEXT_PUBLIC_MCP_SERVER_PORT || '3001'),
     enabled: process.env.NEXT_PUBLIC_MCP_ENABLED === 'true',
     healthCheckInterval: parseInt(process.env.NEXT_PUBLIC_MCP_HEALTH_CHECK_INTERVAL || '5000'),
-    // Production settings
-    isProduction: process.env.NODE_ENV === 'production',
-    productionServerUrl: process.env.NEXT_PUBLIC_MCP_PRODUCTION_URL,
-    fallbackEnabled: process.env.NEXT_PUBLIC_MCP_FALLBACK_ENABLED === 'true',
   },
   
   // Environment
