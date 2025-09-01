@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import fs from "node:fs/promises";
 import path from "node:path";
+import http from "node:http";
 
 async function main() {
   const server = new McpServer({ name: "Basin", version: "1.0.0" });
@@ -86,6 +87,98 @@ async function main() {
     })
   );
 
+  // Start HTTP server for dashboard integration
+  const httpServer = http.createServer(async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+
+    try {
+      if (req.url === '/health') {
+        const startTime = Date.now();
+        const uptime = process.uptime();
+        const uptimeFormatted = `${Math.floor(uptime / 86400)}d ${Math.floor((uptime % 86400) / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`;
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          status: 'healthy',
+          uptime: uptimeFormatted,
+          connections: 1, // Simulated connection count
+          timestamp: new Date().toISOString(),
+          server: 'Basin MCP Server',
+          version: '1.0.0'
+        }));
+      } else if (req.url === '/tools') {
+        const tools = [
+          { name: 'echo', description: 'Echo back the input text', parameters: { text: 'string' } },
+          { name: 'now', description: 'Get current timestamp', parameters: {} },
+          { name: 'read_file', description: 'Read a file from the repository', parameters: { relPath: 'string' } },
+          { name: 'get_collection_stats', description: 'Get statistics about data collections', parameters: {} }
+        ];
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ tools }));
+      } else if (req.url === '/models') {
+        const models = [
+          { name: 'GPT-4', description: 'OpenAI GPT-4 model', capabilities: ['text-generation', 'reasoning'] },
+          { name: 'Claude', description: 'Anthropic Claude model', capabilities: ['text-generation', 'analysis'] },
+          { name: 'Gemini', description: 'Google Gemini model', capabilities: ['text-generation', 'multimodal'] }
+        ];
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ models }));
+      } else if (req.url === '/resources') {
+        const resources = [
+          { name: 'welcome', uri: 'text://welcome', description: 'Welcome message resource' }
+        ];
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ resources }));
+      } else if (req.url === '/status') {
+        const startTime = Date.now();
+        const uptime = process.uptime();
+        const uptimeFormatted = `${Math.floor(uptime / 86400)}d ${Math.floor((uptime % 86400) / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`;
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          isRunning: true,
+          port: 3001,
+          uptime: uptimeFormatted,
+          connections: 1,
+          lastCheck: new Date().toISOString(),
+          server: 'Basin MCP Server',
+          version: '1.0.0'
+        }));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    } catch (error) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+  });
+
+  const PORT = process.env.MCP_HTTP_PORT ? parseInt(process.env.MCP_HTTP_PORT) : 3001;
+  
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 Basin MCP Server HTTP endpoint running on port ${PORT}`);
+    console.log(`📊 Dashboard endpoints available:`);
+    console.log(`   - Health check: http://localhost:${PORT}/health`);
+    console.log(`   - Tools: http://localhost:${PORT}/tools`);
+    console.log(`   - Models: http://localhost:${PORT}/models`);
+    console.log(`   - Resources: http://localhost:${PORT}/resources`);
+    console.log(`   - Status: http://localhost:${PORT}/status`);
+  });
+
+  // Connect to MCP transport
   await server.connect(new StdioServerTransport());
 }
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/auth-provider';
 import { LoginForm } from '@/components/auth/login-form';
 import { authAPI, tenantsAPI } from '@/lib/api';
+import { logger, logAuth } from '@/lib/logger';
 
 interface Tenant {
   id: string;
@@ -32,10 +33,12 @@ export default function LoginPage() {
   useEffect(() => {
     const fetchTenants = async () => {
       try {
+        logAuth('Fetching available tenants for login page');
         const tenants = await tenantsAPI.list();
         setAvailableTenants(tenants);
+        logAuth('Tenants fetched successfully', { tenantCount: tenants.length });
       } catch (error) {
-        console.error('Failed to fetch tenants:', error);
+        logger.error('Failed to fetch tenants for login page', undefined, error instanceof Error ? error : new Error('Unknown error'));
         // Don't show error to user, just log it
       }
     };
@@ -85,6 +88,7 @@ export default function LoginPage() {
           tenant_slug: tenantSlug || undefined
         };
         
+        logAuth('Signup attempt started', { email, tenant_slug: tenantSlug });
         await authAPI.signup(signupData);
         
         // Sign up successful, show success message and switch to login
@@ -94,15 +98,31 @@ export default function LoginPage() {
         setLastName('');
         setConfirmPassword('');
         setPassword('');
+        
+        logAuth('Signup completed successfully', { email, tenant_slug: tenantSlug });
       } else {
+        logAuth('Login attempt started from login page', { email, tenant_slug: tenantSlug });
         await login(email, password, tenantSlug || undefined);
+        logAuth('Login successful, redirecting to dashboard', { email, tenant_slug: tenantSlug });
         router.push('/dashboard');
       }
-    } catch {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      
       if (isSignUp) {
-        setError('Failed to create account. Please try again.');
+        setError(`Failed to create account: ${errorMessage}`);
+        logAuth('Signup failed on login page', { 
+          email, 
+          tenant_slug: tenantSlug,
+          errorMessage 
+        }, error instanceof Error ? error : new Error('Unknown error'));
       } else {
-        setError('Invalid email or password');
+        setError(errorMessage);
+        logAuth('Login failed on login page', { 
+          email, 
+          tenant_slug: tenantSlug,
+          errorMessage 
+        }, error instanceof Error ? error : new Error('Unknown error'));
       }
     } finally {
       setIsLoading(false);
