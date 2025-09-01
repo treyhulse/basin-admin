@@ -18,8 +18,49 @@ const authenticatedAPI = axios.create({
   }
 });
 
+// Debug: Log the configuration being used
+console.log('MCP: Config loaded:', {
+  baseURL: config.api.baseURL,
+  env: config.env,
+  isDevelopment: config.isDevelopment
+});
+
 const handler = createMcpHandler(
   async (server) => {
+    // Test API connection
+    server.tool(
+      "testAPIConnection",
+      "Test the API connection and authentication",
+      {},
+      async () => {
+        try {
+          console.log('MCP: Testing API connection...');
+          const response = await authenticatedAPI.get('/');
+          console.log('MCP: Test response:', response.status, response.data);
+          
+          return {
+            content: [
+              { 
+                type: "text", 
+                text: `API connection test successful! Status: ${response.status}. Base URL: ${config.api.baseURL}`
+              }
+            ]
+          };
+        } catch (error: any) {
+          console.error('MCP: API connection test failed:', error);
+          
+          return {
+            content: [
+              { 
+                type: "text", 
+                text: `API connection test failed: ${error.message || 'Unknown error'}. Status: ${error.response?.status}. URL: ${config.api.baseURL}`
+              }
+            ]
+          };
+        }
+      }
+    );
+
     // List collections
     server.tool(
       "listCollections",
@@ -37,22 +78,32 @@ const handler = createMcpHandler(
       },
       async (params) => {
         try {
+          console.log('MCP: Attempting to list collections with params:', params);
+          console.log('MCP: Using API URL:', `${config.api.baseURL}/items/collections`);
+          
           const response = await authenticatedAPI.get('/items/collections', { params });
+          console.log('MCP: API Response status:', response.status);
+          console.log('MCP: API Response data:', response.data);
+          
           const collections = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully retrieved ${collections?.length || 0} collections.`
+                text: `Successfully retrieved ${collections?.length || 0} collections. Response: ${JSON.stringify(collections)}`
               }
             ]
           };
-        } catch (error) {
+        } catch (error: any) {
+          console.error('MCP: Error listing collections:', error);
+          console.error('MCP: Error response:', error.response?.data);
+          console.error('MCP: Error status:', error.response?.status);
+          
           return {
             content: [
               { 
                 type: "text", 
-                text: `Error listing collections: ${error instanceof Error ? error.message : 'Unknown error'}`
+                text: `Error listing collections: ${error.message || 'Unknown error'}. Status: ${error.response?.status}. Response: ${JSON.stringify(error.response?.data)}`
               }
             ]
           };
@@ -105,22 +156,33 @@ const handler = createMcpHandler(
       },
       async ({ name, description, icon, is_primary, tenant_id }) => {
         try {
-          const response = await authenticatedAPI.post('/items/collections', { name, description, icon, is_primary, tenant_id });
+          const collectionData = { name, description, icon, is_primary, tenant_id };
+          console.log('MCP: Attempting to create collection with data:', collectionData);
+          console.log('MCP: Using API URL:', `${config.api.baseURL}/items/collections`);
+          
+          const response = await authenticatedAPI.post('/items/collections', collectionData);
+          console.log('MCP: Create Response status:', response.status);
+          console.log('MCP: Create Response data:', response.data);
+          
           const collection = response.data;
           return {
             content: [
               { 
                 type: "text", 
-                text: `Successfully created collection: ${collection?.name || 'Unknown'}`
+                text: `Successfully created collection: ${collection?.name || 'Unknown'}. Response: ${JSON.stringify(collection)}`
               }
             ]
           };
-        } catch (error) {
+        } catch (error: any) {
+          console.error('MCP: Error creating collection:', error);
+          console.error('MCP: Error response:', error.response?.data);
+          console.error('MCP: Error status:', error.response?.status);
+          
           return {
             content: [
               { 
                 type: "text", 
-                text: `Error creating collection: ${error instanceof Error ? error.message : 'Unknown error'}`
+                text: `Error creating collection: ${error.message || 'Unknown error'}. Status: ${error.response?.status}. Response: ${JSON.stringify(error.response?.data)}`
               }
             ]
           };
@@ -256,6 +318,9 @@ const handler = createMcpHandler(
   {
     capabilities: {
       tools: { 
+        testAPIConnection: { 
+          description: "Test the API connection and authentication" 
+        },
         listCollections: { 
           description: "List all collections with optional filtering and pagination" 
         },

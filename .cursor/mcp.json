@@ -3,6 +3,11 @@
     "basin-mcp": {
       "url": "https://basin-admin.vercel.app/mcp",
       "transport": "http"
+    },
+    "basin-mcp-local": {
+      "command": "npm",
+      "args": ["run", "mcp:dev"],
+      "env": {}
     }
   }
 }

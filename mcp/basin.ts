@@ -1,185 +1,334 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import fs from "node:fs/promises";
-import path from "node:path";
-import http from "node:http";
+import axios from "axios";
+
+// Basin API configuration
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "your-basin-api-token";
+
+// Create authenticated API client
+const basinAPI = axios.create({
+  baseURL: NEXT_PUBLIC_API_URL,
+  headers: {
+    'Authorization': `Bearer ${BASIN_API_TOKEN}`,
+    'Content-Type': 'application/json'
+  }
+});
 
 async function main() {
-  const server = new McpServer({ name: "Basin", version: "1.0.0" });
+  const server = new McpServer({ 
+    name: "Basin Admin", 
+    version: "1.0.0" 
+  });
 
-  // echo tool
+  // List collections tool
   server.tool(
-    "echo",
-    "Echo back the input text",
-    { text: { type: "string", description: "Text to echo" } },
-    async ({ text }) => {
-      return { content: [{ type: "text", text }] };
-    }
-  );
-
-  // now tool
-  server.tool("now", "Get current timestamp", {}, async () => ({
-    content: [{ type: "text", text: new Date().toISOString() }]
-  }));
-
-  // read_file tool (restrict to a safe base dir)
-  const BASE = path.resolve(process.cwd());
-  server.tool(
-    "read_file",
-    "Read a file from the repository",
-    { relPath: { type: "string", description: "Path relative to repo root" } },
-    async ({ relPath }) => {
-      const full = path.resolve(BASE, relPath);
-      if (!full.startsWith(BASE)) {
-        return { content: [{ type: "text", text: "Blocked: outside base dir" }] };
+    "listCollections",
+    "List all collections with optional filtering and pagination",
+    {
+      limit: { type: "number", description: "Number of collections to return" },
+      offset: { type: "number", description: "Number of collections to skip" },
+      page: { type: "number", description: "Page number for pagination" },
+      per_page: { type: "number", description: "Collections per page" },
+      sort: { type: "string", description: "Field to sort by" },
+      order: { type: "string", description: "Sort order (asc/desc)" },
+      name: { type: "string", description: "Filter by collection name" },
+      icon: { type: "string", description: "Filter by icon" },
+      is_primary: { type: "boolean", description: "Filter by primary status" },
+    },
+    async (params) => {
+      try {
+        const response = await basinAPI.get('/collections', { params });
+        const collections = response.data;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully retrieved ${collections?.length || 0} collections from Basin API.\n\nCollections:\n${collections?.map((c: any) => `- ${c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error listing collections:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error listing collections: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
       }
-      const data = await fs.readFile(full, "utf8");
-      return { content: [{ type: "text", text: data.slice(0, 4000) }] }; // keep responses tidy
     }
   );
 
-  // get_collection_stats tool - useful for the admin interface
+  // Get collection tool
   server.tool(
-    "get_collection_stats",
-    "Get statistics about data collections in the Basin admin",
+    "getCollection",
+    "Get a specific collection by its ID",
+    {
+      id: { type: "string", description: "The ID of the collection to retrieve" },
+    },
+    async ({ id }) => {
+      try {
+        const response = await basinAPI.get(`/collections/${id}`);
+        const collection = response.data;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully retrieved collection: ${collection.name}\n\nCollection Details:\n${JSON.stringify(collection, null, 2)}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error getting collection:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error retrieving collection: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Create collection tool
+  server.tool(
+    "createCollection",
+    "Create a new collection",
+    {
+      name: { type: "string", description: "Name of the collection" },
+      description: { type: "string", description: "Description of the collection" },
+      icon: { type: "string", description: "Icon for the collection" },
+      is_primary: { type: "boolean", description: "Whether this is a primary collection" },
+      tenant_id: { type: "string", description: "Tenant ID for the collection" },
+    },
+    async ({ name, description, icon, is_primary, tenant_id }) => {
+      try {
+        const collectionData = {
+          name,
+          description,
+          icon: icon || "database",
+          is_primary: is_primary || false,
+          tenant_id: tenant_id || "default"
+        };
+        
+        const response = await basinAPI.post('/collections', collectionData);
+        const createdCollection = response.data;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully created collection: ${createdCollection.name}\n\nCollection Details:\n${JSON.stringify(createdCollection, null, 2)}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error creating collection:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error creating collection: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Update collection tool
+  server.tool(
+    "updateCollection",
+    "Update an existing collection",
+    {
+      id: { type: "string", description: "The ID of the collection to update" },
+      name: { type: "string", description: "Name of the collection" },
+      description: { type: "string", description: "Description of the collection" },
+      icon: { type: "string", description: "Icon for the collection" },
+      is_primary: { type: "boolean", description: "Whether this is a primary collection" },
+      tenant_id: { type: "string", description: "Tenant ID for the collection" },
+    },
+    async ({ id, ...updateData }) => {
+      try {
+        const response = await basinAPI.put(`/collections/${id}`, updateData);
+        const updatedCollection = response.data;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully updated collection: ${updatedCollection.name}\n\nUpdated Collection Details:\n${JSON.stringify(updatedCollection, null, 2)}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error updating collection:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error updating collection: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Delete collection tool
+  server.tool(
+    "deleteCollection",
+    "Delete a collection by its ID",
+    {
+      id: { type: "string", description: "The ID of the collection to delete" },
+    },
+    async ({ id }) => {
+      try {
+        await basinAPI.delete(`/collections/${id}`);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully deleted collection with ID: ${id}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error deleting collection:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error deleting collection: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Bulk collection operations tool
+  server.tool(
+    "bulkCollectionOperations",
+    "Perform bulk operations on collections (create multiple, update multiple, etc.)",
+    {
+      operations: { 
+        type: "array", 
+        description: "Array of operations to perform",
+        items: {
+          type: "object",
+          properties: {
+            action: { type: "string", description: "Action to perform (create, update, delete)" },
+            data: { type: "object", description: "Data for the operation" },
+            id: { type: "string", description: "Collection ID for update/delete operations" }
+          }
+        }
+      }
+    },
+    async ({ operations }) => {
+      try {
+        const results = [];
+        
+        for (const operation of operations) {
+          try {
+            let response;
+            switch (operation.action) {
+              case 'create':
+                response = await basinAPI.post('/collections', operation.data);
+                results.push({ action: 'create', success: true, data: response.data });
+                break;
+              case 'update':
+                response = await basinAPI.put(`/collections/${operation.id}`, operation.data);
+                results.push({ action: 'update', success: true, data: response.data });
+                break;
+              case 'delete':
+                await basinAPI.delete(`/collections/${operation.id}`);
+                results.push({ action: 'delete', success: true, id: operation.id });
+                break;
+              default:
+                results.push({ action: operation.action, success: false, error: 'Unknown action' });
+            }
+          } catch (error) {
+            results.push({ 
+              action: operation.action, 
+              success: false, 
+              error: error instanceof Error ? error.message : 'Unknown error' 
+            });
+          }
+        }
+        
+        const successCount = results.filter(r => r.success).length;
+        const totalCount = results.length;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Bulk operations completed. ${successCount}/${totalCount} operations succeeded.\n\nResults:\n${JSON.stringify(results, null, 2)}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error in bulk operations:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error in bulk operations: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Test API connection tool
+  server.tool(
+    "testAPIConnection",
+    "Test the connection to the Basin API",
     {},
     async () => {
       try {
-        // Read the collections directory to get collection info
-        const collectionsPath = path.join(BASE, "src/app/dashboard/data");
-        const collections = await fs.readdir(collectionsPath, { withFileTypes: true });
-        
-        const collectionStats = {
-          totalCollections: collections.filter(dir => dir.isDirectory()).length,
-          collections: collections
-            .filter(dir => dir.isDirectory())
-            .map(dir => dir.name)
-            .filter(name => name !== "[collection]") // exclude Next.js dynamic route
-        };
-
-        return { 
-          content: [{ 
-            type: "text", 
-            text: `📊 Basin Admin Collection Statistics:\n\n` +
-                  `Total Collections: ${collectionStats.totalCollections}\n` +
-                  `Collection Names: ${collectionStats.collections.join(", ")}\n\n` +
-                  `This tool helps you understand the data structure of your Basin admin interface.`
-          }] 
+        const response = await basinAPI.get('/health');
+        return {
+          content: [
+            {
+              type: "text",
+              text: `✅ Basin API connection successful!\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(response.data, null, 2)}`
+            }
+          ]
         };
       } catch (error) {
-        return { 
-          content: [{ 
-            type: "text", 
-            text: `❌ Error reading collection stats: ${error instanceof Error ? error.message : 'Unknown error'}`
-          }] 
+        console.error('API connection test failed:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Basin API connection failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+            }
+          ]
         };
       }
     }
   );
 
-  // expose a tiny resource
-  server.resource(
-    "welcome",
-    "text://welcome",
-    async () => ({
-      contents: [{ uri: "text://welcome", text: "🏞️ Welcome to Basin Admin MCP Server!" }]
-    })
-  );
-
-  // Start HTTP server for dashboard integration
-  const httpServer = http.createServer(async (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-      res.writeHead(200);
-      res.end();
-      return;
-    }
-
-    try {
-      if (req.url === '/health') {
-        const startTime = Date.now();
-        const uptime = process.uptime();
-        const uptimeFormatted = `${Math.floor(uptime / 86400)}d ${Math.floor((uptime % 86400) / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`;
-        
-        res.writeHead(200);
-        res.end(JSON.stringify({
-          status: 'healthy',
-          uptime: uptimeFormatted,
-          connections: 1, // Simulated connection count
-          timestamp: new Date().toISOString(),
-          server: 'Basin MCP Server',
-          version: '1.0.0'
-        }));
-      } else if (req.url === '/tools') {
-        const tools = [
-          { name: 'echo', description: 'Echo back the input text', parameters: { text: 'string' } },
-          { name: 'now', description: 'Get current timestamp', parameters: {} },
-          { name: 'read_file', description: 'Read a file from the repository', parameters: { relPath: 'string' } },
-          { name: 'get_collection_stats', description: 'Get statistics about data collections', parameters: {} }
-        ];
-        
-        res.writeHead(200);
-        res.end(JSON.stringify({ tools }));
-      } else if (req.url === '/models') {
-        const models = [
-          { name: 'GPT-4', description: 'OpenAI GPT-4 model', capabilities: ['text-generation', 'reasoning'] },
-          { name: 'Claude', description: 'Anthropic Claude model', capabilities: ['text-generation', 'analysis'] },
-          { name: 'Gemini', description: 'Google Gemini model', capabilities: ['text-generation', 'multimodal'] }
-        ];
-        
-        res.writeHead(200);
-        res.end(JSON.stringify({ models }));
-      } else if (req.url === '/resources') {
-        const resources = [
-          { name: 'welcome', uri: 'text://welcome', description: 'Welcome message resource' }
-        ];
-        
-        res.writeHead(200);
-        res.end(JSON.stringify({ resources }));
-      } else if (req.url === '/status') {
-        const startTime = Date.now();
-        const uptime = process.uptime();
-        const uptimeFormatted = `${Math.floor(uptime / 86400)}d ${Math.floor((uptime % 86400) / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`;
-        
-        res.writeHead(200);
-        res.end(JSON.stringify({
-          isRunning: true,
-          port: 3001,
-          uptime: uptimeFormatted,
-          connections: 1,
-          lastCheck: new Date().toISOString(),
-          server: 'Basin MCP Server',
-          version: '1.0.0'
-        }));
-      } else {
-        res.writeHead(404);
-        res.end(JSON.stringify({ error: 'Not found' }));
-      }
-    } catch (error) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: 'Internal server error' }));
-    }
-  });
-
-  const PORT = process.env.MCP_HTTP_PORT ? parseInt(process.env.MCP_HTTP_PORT) : 3001;
-  
-  httpServer.listen(PORT, () => {
-    console.log(`🚀 Basin MCP Server HTTP endpoint running on port ${PORT}`);
-    console.log(`📊 Dashboard endpoints available:`);
-    console.log(`   - Health check: http://localhost:${PORT}/health`);
-    console.log(`   - Tools: http://localhost:${PORT}/tools`);
-    console.log(`   - Models: http://localhost:${PORT}/models`);
-    console.log(`   - Resources: http://localhost:${PORT}/resources`);
-    console.log(`   - Status: http://localhost:${PORT}/status`);
-  });
-
-  // Connect to MCP transport
+  // Connect to stdio transport for local development
   await server.connect(new StdioServerTransport());
+  
+  console.log("🔌 Basin MCP Server connected via stdio transport");
+  console.log("📡 Available tools: listCollections, getCollection, createCollection, updateCollection, deleteCollection, bulkCollectionOperations, testAPIConnection");
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(e => { 
+  console.error("MCP Server error:", e); 
+  process.exit(1); 
+});
