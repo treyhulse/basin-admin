@@ -83,21 +83,74 @@ export function UseCasesSection() {
   const [hoveredUseCase, setHoveredUseCase] = useState<UseCase | null>(useCases[0]);
 
   return (
-    <section className="py-20">
+    <section className="py-12 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground mb-3 sm:mb-4">
               Perfect For Every Use Case
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
               Whether you&apos;re building your next big idea or scaling existing applications, 
               Basin Admin adapts to your needs.
             </p>
           </div>
           
-          <div className="bg-background/50 backdrop-blur-sm rounded-2xl border border-border/50 p-8 shadow-sm">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="bg-background/50 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-border/50 p-4 sm:p-6 lg:p-8 shadow-sm">
+            {/* Mobile Layout - Stacked */}
+            <div className="block lg:hidden">
+              {useCases.map((useCase, index) => (
+                <div key={useCase.id} className="mb-6 last:mb-0">
+                  <div
+                    className={`p-4 sm:p-6 border-l-4 border-transparent cursor-pointer transition-all duration-200 rounded-lg ${
+                      hoveredUseCase?.id === useCase.id
+                        ? 'border-l-primary bg-primary/5'
+                        : 'hover:border-l-primary/30 hover:bg-background/30'
+                    }`}
+                    onClick={() => setHoveredUseCase(useCase)}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-background/80 flex items-center justify-center ${useCase.iconColor} flex-shrink-0`}>
+                        <useCase.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{useCase.title}</h3>
+                        <p className="text-sm sm:text-base text-muted-foreground mb-3">{useCase.description}</p>
+                        
+                        {/* Features */}
+                        <div className="mb-3">
+                          <h4 className="text-sm font-semibold text-foreground mb-2">Key Features</h4>
+                          <div className="space-y-1">
+                            {useCase.features.map((feature, featureIndex) => (
+                              <div key={featureIndex} className="flex items-center space-x-2">
+                                <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
+                                <span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Benefits */}
+                        <div>
+                          <h4 className="text-sm font-semibold text-foreground mb-2">Why Choose This</h4>
+                          <div className="space-y-1">
+                            {useCase.benefits.map((benefit, benefitIndex) => (
+                              <div key={benefitIndex} className="flex items-center space-x-2">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
+                                <span className="text-xs sm:text-sm text-muted-foreground">{benefit}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Layout - Side by Side */}
+            <div className="hidden lg:grid grid-cols-3 gap-12">
               {/* Left Column - Use Case List */}
               <div className="flex flex-col">
                 {useCases.map((useCase, index) => (
@@ -123,7 +176,7 @@ export function UseCasesSection() {
               </div>
 
               {/* Right Column - Use Case Details */}
-              <div className="lg:col-span-2 lg:pl-8 flex flex-col">
+              <div className="col-span-2 pl-8 flex flex-col">
                 {hoveredUseCase && (
                   <div className="sticky top-8 h-full">
                     <div className="bg-background/80 rounded-xl border p-8 shadow-sm h-full flex flex-col">

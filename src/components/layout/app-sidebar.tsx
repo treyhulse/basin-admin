@@ -9,18 +9,12 @@ import {
   Database,
   ShieldUser,
   Wrench,
-  KeyRound,
   Settings,
-  Building2,
-  Crown,
-  Users,
-  UserCheck,
-  Shield,
-  ChevronRight,
 } from "lucide-react"
 
 import { NavMain } from "@/components/layout/nav-main"
 import { NavMCP } from "@/components/layout/nav-mcp"
+import { NavCore } from "@/components/layout/nav-core"
 import { NavUser } from "@/components/layout/nav-user"
 import { SidebarHeader as SidebarHeaderComponent } from "@/components/layout/sidebar-header"
 import {
@@ -34,15 +28,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
@@ -96,135 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavMCP mcpTools={data.mcpTools} />
-        
-        {/* Core System Tables Section */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Core</SidebarGroupLabel>
-          <SidebarMenu>
-            {/* Users & Access Group */}
-            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/users") || pathname.startsWith("/dashboard/roles") || pathname.startsWith("/dashboard/permissions") || pathname.startsWith("/dashboard/user-roles")}>
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="Users & Access">
-                    <Users />
-                    <span>Users & Access</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/users")}>
-                        <a href="/dashboard/users">
-                          <Users />
-                          <span>Users</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/roles")}>
-                        <a href="/dashboard/roles">
-                          <Crown />
-                          <span>Roles</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/permissions")}>
-                        <a href="/dashboard/permissions">
-                          <Shield />
-                          <span>Permissions</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/user-roles")}>
-                        <a href="/dashboard/user-roles">
-                          <UserCheck />
-                          <span>User Roles</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-
-            {/* Organization Group */}
-            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/tenants") || pathname.startsWith("/dashboard/user-tenants")}>
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="Organization">
-                    <Building2 />
-                    <span>Organization</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/tenants")}>
-                        <a href="/dashboard/tenants">
-                          <Building2 />
-                          <span>Tenants</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/user-tenants")}>
-                        <a href="/dashboard/user-tenants">
-                          <UserCheck />
-                          <span>User Tenants</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-
-            {/* Data Management Group */}
-            <Collapsible asChild defaultOpen={pathname.startsWith("/dashboard/collections") || pathname.startsWith("/dashboard/fields") || pathname.startsWith("/dashboard/api-keys")}>
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="Data Management">
-                    <Database />
-                    <span>Data Management</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 data-[state=open]:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/collections")}>
-                        <a href="/dashboard/collections">
-                          <Database />
-                          <span>Collections</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/fields")}>
-                        <a href="/dashboard/fields">
-                          <Settings />
-                          <span>Fields</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={pathname.startsWith("/dashboard/api-keys")}>
-                        <a href="/dashboard/api-keys">
-                          <KeyRound />
-                          <span>API Keys</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-          </SidebarMenu>
-        </SidebarGroup>
+        <NavCore />
 
         {/* System Section */}
         <SidebarGroup>

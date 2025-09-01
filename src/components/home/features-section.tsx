@@ -57,16 +57,36 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-20 sm:py-32">
+    <section id="features" className="py-12 sm:py-20 lg:py-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center mb-16">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
+        <div className="mx-auto max-w-3xl text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-foreground mb-4 sm:mb-6">
             Backend setup in minutes, not months
           </h2>
         </div>
         
-        {/* Bento Box Grid Layout */}
-        <div className="grid grid-cols-12 gap-4 auto-rows-[200px]">
+        {/* Mobile Layout - Simple Grid */}
+        <div className="block lg:hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {features.map((feature, index) => (
+              <Link key={feature.href} href={feature.href}>
+                <Card className="h-auto border-0 shadow-sm transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm cursor-pointer group">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300 mb-3">
+                      {feature.title}
+                    </CardTitle>
+                    <div className="w-full h-20 sm:h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 rounded-lg p-3 flex items-center justify-center group-hover:bg-gradient-radial group-hover:from-primary/20 group-hover:via-primary/10 group-hover:to-transparent dark:group-hover:from-primary/30 dark:group-hover:via-primary/20 dark:group-hover:to-transparent transition-all duration-300">
+                      <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-gray-600 group-hover:text-primary transition-colors duration-300" />
+                    </div>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Layout - Bento Box Grid */}
+        <div className="hidden lg:grid grid-cols-12 gap-4 auto-rows-[200px]">
           {/* Top Row - 3 columns */}
           <div className="col-span-4">
             <Link href={features[0].href}>
