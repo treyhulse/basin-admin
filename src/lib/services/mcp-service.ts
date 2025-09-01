@@ -61,8 +61,8 @@ export class MCPService {
   // Get the appropriate endpoint for the current server type
   private getEndpoint(path: string): string {
     if (this.serverType === 'mcp-handler') {
-      // mcp-handler uses /mcp for all endpoints
-      return `${this.baseUrl}/mcp`;
+      // mcp-handler uses the baseUrl directly (already contains /mcp)
+      return this.baseUrl;
     } else {
       // local-http uses specific endpoints
       return `${this.baseUrl}${path}`;
@@ -218,8 +218,8 @@ export class MCPService {
 
   async getAvailableModels(): Promise<MCPModel[]> {
     try {
-      const endpoint = this.serverType === 'mcp-handler' ? '/mcp' : '/models';
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const endpoint = this.serverType === 'mcp-handler' ? this.baseUrl : `${this.baseUrl}/models`;
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -240,8 +240,8 @@ export class MCPService {
 
   async getAvailableResources(): Promise<MCPResource[]> {
     try {
-      const endpoint = this.serverType === 'mcp-handler' ? '/mcp' : '/resources';
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const endpoint = this.serverType === 'mcp-handler' ? this.baseUrl : `${this.baseUrl}/resources`;
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
