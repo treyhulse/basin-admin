@@ -22,12 +22,12 @@ import { config } from '@/lib/config'
  * - Token is forwarded to backend API for validation
  * 
  * @param request - Next.js request object
- * @param params - Route parameters containing the field ID
+ * @param params - Route parameters containing the field ID (Promise-based in Next.js 15+)
  * @returns JSON response with field data or error
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authorization header from the client request
@@ -44,8 +44,11 @@ export async function GET(
       )
     }
 
+    // Await the params Promise and extract the id
+    const { id } = await params
+    
     // Make direct request to backend with forwarded auth header
-    const response = await axios.get(`${config.api.baseURL}/items/fields/${params.id}`, {
+    const response = await axios.get(`${config.api.baseURL}/items/fields/${id}`, {
       headers: {
         'Authorization': authHeader,
         'Content-Type': 'application/json'
@@ -78,12 +81,12 @@ export async function GET(
  * Updates an existing field with new data. Only provided fields will be updated.
  * 
  * @param request - Next.js request object with updated field data in body
- * @param params - Route parameters containing the field ID
+ * @param params - Route parameters containing the field ID (Promise-based in Next.js 15+)
  * @returns JSON response with updated field data or error
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authorization header from the client request
@@ -100,6 +103,9 @@ export async function PUT(
       )
     }
 
+    // Await the params Promise and extract the id
+    const { id } = await params
+    
     const body = await request.json()
     
     if (!body.name || !body.field_type) {
@@ -114,7 +120,7 @@ export async function PUT(
     }
     
     // Make direct request to backend with forwarded auth header
-    const response = await axios.put(`${config.api.baseURL}/items/fields/${params.id}`, body, {
+    const response = await axios.put(`${config.api.baseURL}/items/fields/${id}`, body, {
       headers: {
         'Authorization': authHeader,
         'Content-Type': 'application/json'
@@ -147,12 +153,12 @@ export async function PUT(
  * Permanently deletes a field from the collection. This operation cannot be undone.
  * 
  * @param request - Next.js request object
- * @param params - Route parameters containing the field ID
+ * @param params - Route parameters containing the field ID (Promise-based in Next.js 15+)
  * @returns JSON response confirming deletion or error
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authorization header from the client request
@@ -168,8 +174,11 @@ export async function DELETE(
       )
     }
 
+    // Await the params Promise and extract the id
+    const { id } = await params
+    
     // Make direct request to backend with forwarded auth header
-    await axios.delete(`${config.api.baseURL}/items/fields/${params.id}`, {
+    await axios.delete(`${config.api.baseURL}/items/fields/${id}`, {
       headers: {
         'Authorization': authHeader,
         'Content-Type': 'application/json'
