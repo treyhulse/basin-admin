@@ -74,7 +74,7 @@ export class MCPService {
       // Try to connect to the MCP server
       if (this.serverType === 'mcp-handler') {
         // mcp-handler expects POST requests with MCP protocol data
-        const endpoint = this.baseUrl.endsWith('/mcp') ? this.baseUrl : `${this.baseUrl}/mcp`;
+        const endpoint = this.baseUrl;
         console.log('Attempting to connect to production MCP server:', endpoint);
         
         const response = await fetch(endpoint, {
@@ -159,7 +159,7 @@ export class MCPService {
     try {
       if (this.serverType === 'mcp-handler') {
         // mcp-handler expects POST requests with MCP protocol data
-        const endpoint = this.baseUrl.endsWith('/mcp') ? this.baseUrl : `${this.baseUrl}/mcp`;
+        const endpoint = this.baseUrl;
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
