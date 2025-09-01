@@ -1,11 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
 import axios from "axios";
 
 // Basin API configuration
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "your-basin-api-token";
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://basin-backend-production.up.railway.app";
+const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_775ec68995f39c5ca095e5cf3da848146a8d7a7a62d080063cfad0552114a994";
 
 // Create authenticated API client
 const basinAPI = axios.create({
@@ -37,16 +36,21 @@ async function main() {
       icon: { type: "string", description: "Filter by icon" },
       is_primary: { type: "boolean", description: "Filter by primary status" },
     },
-    async (params) => {
-      try {
-        const response = await basinAPI.get('/collections', { params });
-        const collections = response.data;
+          async (params) => {
+        try {
+          // For now, let's make this work exactly like the simple version
+          // We can add parameter support back later once we understand what the API accepts
+          console.log('🔍 Sending listCollections request (no params for now)');
+          
+          const response = await basinAPI.get('/items/collections');
+          const collections = response.data.data || response.data;
+          const meta = response.data.meta;
         
         return {
           content: [
             {
               type: "text",
-              text: `Successfully retrieved ${collections?.length || 0} collections from Basin API.\n\nCollections:\n${collections?.map((c: any) => `- ${c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}`
+              text: `Successfully retrieved ${collections?.length || 0} collections from Basin API.\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
             }
           ]
         };
@@ -73,14 +77,15 @@ async function main() {
     },
     async ({ id }) => {
       try {
-        const response = await basinAPI.get(`/collections/${id}`);
-        const collection = response.data;
+        console.log(`🔍 Getting collection with ID: ${id}`);
+        const response = await basinAPI.get(`/items/collections/${id}`);
+        const collection = response.data.data || response.data;
         
         return {
           content: [
             {
               type: "text",
-              text: `Successfully retrieved collection: ${collection.name}\n\nCollection Details:\n${JSON.stringify(collection, null, 2)}`
+              text: `Successfully retrieved collection: ${collection.display_name || collection.name}\n\nCollection Details:\n${JSON.stringify(collection, null, 2)}`
             }
           ]
         };
@@ -114,19 +119,20 @@ async function main() {
         const collectionData = {
           name,
           description,
-          icon: icon || "database",
+          icon: icon || "📝",
           is_primary: is_primary || false,
-          tenant_id: tenant_id || "default"
+          tenant_id: tenant_id || "8da6da20-a5b8-4890-9c88-b004ae1e698d" // Using your actual tenant_id
         };
         
-        const response = await basinAPI.post('/collections', collectionData);
-        const createdCollection = response.data;
+        console.log('🔍 Creating collection:', collectionData);
+        const response = await basinAPI.post('/items/collections', collectionData);
+        const createdCollection = response.data.data || response.data;
         
         return {
           content: [
             {
               type: "text",
-              text: `Successfully created collection: ${createdCollection.name}\n\nCollection Details:\n${JSON.stringify(createdCollection, null, 2)}`
+              text: `Successfully created collection: ${createdCollection.display_name || createdCollection.name}\n\nCollection Details:\n${JSON.stringify(createdCollection, null, 2)}`
             }
           ]
         };
@@ -158,14 +164,15 @@ async function main() {
     },
     async ({ id, ...updateData }) => {
       try {
-        const response = await basinAPI.put(`/collections/${id}`, updateData);
-        const updatedCollection = response.data;
+        console.log(`🔍 Updating collection ${id}:`, updateData);
+        const response = await basinAPI.put(`/items/collections/${id}`, updateData);
+        const updatedCollection = response.data.data || response.data;
         
         return {
           content: [
             {
               type: "text",
-              text: `Successfully updated collection: ${updatedCollection.name}\n\nUpdated Collection Details:\n${JSON.stringify(updatedCollection, null, 2)}`
+              text: `Successfully updated collection: ${updatedCollection.display_name || updatedCollection.name}\n\nUpdated Collection Details:\n${JSON.stringify(updatedCollection, null, 2)}`
             }
           ]
         };
@@ -192,7 +199,8 @@ async function main() {
     },
     async ({ id }) => {
       try {
-        await basinAPI.delete(`/collections/${id}`);
+        console.log(`🔍 Deleting collection with ID: ${id}`);
+        await basinAPI.delete(`/items/collections/${id}`);
         
         return {
           content: [
@@ -236,6 +244,7 @@ async function main() {
     },
     async ({ operations }) => {
       try {
+        console.log('🔍 Performing bulk operations:', operations);
         const results = [];
         
         for (const operation of operations) {
@@ -243,15 +252,15 @@ async function main() {
             let response;
             switch (operation.action) {
               case 'create':
-                response = await basinAPI.post('/collections', operation.data);
-                results.push({ action: 'create', success: true, data: response.data });
+                response = await basinAPI.post('/items/collections', operation.data);
+                results.push({ action: 'create', success: true, data: response.data.data || response.data });
                 break;
               case 'update':
-                response = await basinAPI.put(`/collections/${operation.id}`, operation.data);
-                results.push({ action: 'update', success: true, data: response.data });
+                response = await basinAPI.put(`/items/collections/${operation.id}`, operation.data);
+                results.push({ action: 'update', success: true, data: response.data.data || response.data });
                 break;
               case 'delete':
-                await basinAPI.delete(`/collections/${operation.id}`);
+                await basinAPI.delete(`/items/collections/${operation.id}`);
                 results.push({ action: 'delete', success: true, id: operation.id });
                 break;
               default:
@@ -313,7 +322,41 @@ async function main() {
           content: [
             {
               type: "text",
-              text: `❌ Basin API connection failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${NEXT_PUBLIC_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+              text: `❌ Basin API connection failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check:\n- BASIN_API_URL environment variable (currently: ${BASIN_API_URL})\n- BASIN_API_TOKEN environment variable\n- Basin server is running and accessible`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // Simple collections test tool (no parameters)
+  server.tool(
+    "testCollectionsSimple",
+    "Test collections endpoint with no parameters (like your working curl command)",
+    {},
+    async () => {
+      try {
+        console.log('🔍 Testing simple collections request (no params)');
+        const response = await basinAPI.get('/items/collections');
+        const collections = response.data.data || response.data;
+        const meta = response.data.meta;
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `✅ Simple collections request successful!\n\nStatus: ${response.status}\nCollections found: ${collections?.length || 0}\n\nCollections:\n${collections?.map((c: any) => `- ${c.display_name || c.name}: ${c.description || 'No description'}`).join('\n') || 'No collections found'}\n\nMeta: ${meta ? `Total: ${meta.count}, Limit: ${meta.limit}, Offset: ${meta.offset}` : 'No meta info'}`
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Simple collections test failed:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Simple collections request failed!\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`
             }
           ]
         };
@@ -325,7 +368,7 @@ async function main() {
   await server.connect(new StdioServerTransport());
   
   console.log("🔌 Basin MCP Server connected via stdio transport");
-  console.log("📡 Available tools: listCollections, getCollection, createCollection, updateCollection, deleteCollection, bulkCollectionOperations, testAPIConnection");
+  console.log("📡 Available tools: listCollections, getCollection, createCollection, updateCollection, deleteCollection, bulkCollectionOperations, testAPIConnection, testCollectionsSimple");
 }
 
 main().catch(e => { 
