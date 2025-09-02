@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AuthObjectDebug } from '@/components/auth/auth-object-debug';
-import { TenantDebug } from '@/components/tenant/tenant-debug';
 import { format } from 'date-fns';
 import { 
   User, 
@@ -275,9 +274,6 @@ export default async function ProfilePage() {
 
       {/* Auth Object Debug */}
       <AuthObjectDebug authData={authData} />
-
-      {/* Tenant Debug */}
-      <TenantDebug />
     </div>
   );
 }
