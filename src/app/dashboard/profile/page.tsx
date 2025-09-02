@@ -1,9 +1,10 @@
-'use client';
-
-import { useAuth } from '@/components/providers/auth-provider';
+import { ServerAuth } from '@/lib/server-auth';
+import { AuthService } from '@/lib/services/auth-service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { AuthObjectDebug } from '@/components/auth/auth-object-debug';
+import { TenantDebug } from '@/components/tenant/tenant-debug';
 import { format } from 'date-fns';
 import { 
   User, 
@@ -15,8 +16,19 @@ import {
   Building2
 } from 'lucide-react';
 
-export default function ProfilePage() {
-  const { user, tenant, session, auth } = useAuth();
+export default async function ProfilePage() {
+  // Get auth data on the server
+  const { user, tenant, session, auth, isAuthenticated } = await ServerAuth.getCurrentUser();
+
+  // Prepare auth data for UI display
+  const authData = {
+    auth: auth,
+    user: user,
+    tenant: tenant,
+    session: session,
+    isAuthenticated: isAuthenticated,
+    authSummary: AuthService.getAuthSummary({ user, tenant, session, auth, isAuthenticated })
+  };
 
   if (!user) {
     return (
@@ -57,17 +69,17 @@ export default function ProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center space-x-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold">
-              {user.first_name?.[0]}{user.last_name?.[0]}
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold">
-                {user.first_name} {user.last_name}
-              </h3>
-              <p className="text-muted-foreground">{user.email}</p>
-            </div>
-          </div>
+                     <div className="flex items-center space-x-6">
+             <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold bg-primary text-primary-foreground">
+               {AuthService.getUserInitials(user)}
+             </div>
+             <div className="space-y-2">
+               <h3 className="text-xl font-semibold">
+                 {AuthService.getUserDisplayName(user)}
+               </h3>
+               <p className="text-muted-foreground">{user.email}</p>
+             </div>
+           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -148,14 +160,14 @@ export default function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Admin Status</label>
-              <div className="mt-1">
-                <Badge variant={auth.is_admin ? "default" : "secondary"}>
-                  {auth.is_admin ? "Administrator" : "Regular User"}
-                </Badge>
-              </div>
-            </div>
+                         <div>
+               <label className="text-sm font-medium">Admin Status</label>
+               <div className="mt-1">
+                 <Badge variant={AuthService.isAdmin(auth) ? "default" : "secondary"}>
+                   {AuthService.isAdmin(auth) ? "Administrator" : "Regular User"}
+                 </Badge>
+               </div>
+             </div>
             
             <div>
               <label className="text-sm font-medium">Roles</label>
@@ -260,6 +272,12 @@ export default function ProfilePage() {
           </pre>
         </CardContent>
       </Card>
+
+      {/* Auth Object Debug */}
+      <AuthObjectDebug authData={authData} />
+
+      {/* Tenant Debug */}
+      <TenantDebug />
     </div>
   );
 }

@@ -10,6 +10,35 @@
   "host": "",
   "basePath": "/",
   "paths": {
+    "/auth/context": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get Auth Context",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "consumes": [
@@ -136,6 +165,97 @@
           },
           "409": {
             "description": "Conflict",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/switch-tenant": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Switch Tenant",
+        "parameters": [
+          {
+            "description": "Switch tenant payload",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.SwitchTenantRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/models.SwitchTenantResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tenants": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get User Tenants",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/models.Tenant"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "schema": {
               "type": "object",
               "additionalProperties": {
@@ -3430,6 +3550,34 @@
         },
         "user": {
           "$ref": "#/definitions/models.User"
+        }
+      }
+    },
+    "models.SwitchTenantRequest": {
+      "type": "object",
+      "required": [
+        "tenant_id"
+      ],
+      "properties": {
+        "tenant_id": {
+          "type": "string"
+        }
+      }
+    },
+    "models.SwitchTenantResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "tenant_slug": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
         }
       }
     },

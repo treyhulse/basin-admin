@@ -1,7 +1,7 @@
 export const config = {
   // API Configuration
   api: {
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://basin-backend-production.up.railway.app',
     timeout: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '10000'),
   },
   
