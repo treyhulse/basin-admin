@@ -1,4 +1,4 @@
-import { authAPI, tenantsAPI } from '@/lib/api';
+import { authAPI, tenantsAPI, nextApi } from '@/lib/api';
 import { logger } from '@/lib/logger';
 import type { Tenant } from '@/lib/auth';
 
@@ -69,7 +69,17 @@ export class TenantService {
   static async createTenant(tenantData: CreateTenantRequest): Promise<Tenant> {
     try {
       logger.info('Creating new tenant', { name: tenantData.name, slug: tenantData.slug });
-      const tenant = await tenantsAPI.create(tenantData);
+      
+      // Debug logging
+      console.log('=== TENANT CREATION DEBUG ===');
+      console.log('Using Next.js API proxy instead of direct backend call');
+      console.log('Tenant Data:', tenantData);
+      console.log('=============================');
+      
+      // Use Next.js API route to avoid CORS issues
+      const response = await nextApi.post('/api/tenants', tenantData);
+      const tenant = response.data;
+      
       logger.info('Tenant created successfully', { 
         tenantId: tenant.id, 
         name: tenant.name, 
@@ -81,6 +91,19 @@ export class TenantService {
         name: tenantData.name, 
         slug: tenantData.slug 
       }, error as Error);
+      
+      // Enhanced error logging
+      console.error('=== TENANT CREATION ERROR ===');
+      console.error('Error:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as any;
+        console.error('Response Status:', apiError.response?.status);
+        console.error('Response Data:', apiError.response?.data);
+        console.error('Request URL:', apiError.config?.url);
+        console.error('Request Method:', apiError.config?.method);
+        console.error('Request Headers:', apiError.config?.headers);
+      }
+      console.error('=============================');
       
       // Re-throw with more context if it's an API error
       if (error && typeof error === 'object' && 'response' in error) {
@@ -98,6 +121,16 @@ export class TenantService {
           throw new Error('You do not have permission to create tenants');
         } else if (status >= 500) {
           throw new Error('Server error occurred while creating tenant');
+        }
+      }
+      
+      // Handle network errors specifically
+      if (error && typeof error === 'object' && 'code' in error) {
+        const networkError = error as any;
+        if (networkError.code === 'ERR_NETWORK') {
+          throw new Error('Network error: Cannot connect to the server. Please check your internet connection and try again.');
+        } else if (networkError.code === 'ECONNABORTED') {
+          throw new Error('Request timeout: The server took too long to respond. Please try again.');
         }
       }
       
@@ -130,10 +163,46 @@ export class TenantService {
   static async deleteTenant(id: string): Promise<void> {
     try {
       logger.info('Deleting tenant', { tenantId: id });
-      await tenantsAPI.delete(id);
+      
+      // Use Next.js API route to avoid CORS issues
+      const response = await nextApi.delete(`/api/tenants/${id}`);
+      
       logger.info('Tenant deleted successfully', { tenantId: id });
     } catch (error) {
       logger.error('Failed to delete tenant', { tenantId: id }, error as Error);
+      
+      // Enhanced error logging
+      console.error('=== TENANT DELETION ERROR ===');
+      console.error('Error:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as any;
+        console.error('Response Status:', apiError.response?.status);
+        console.error('Response Data:', apiError.response?.data);
+        console.error('Request URL:', apiError.config?.url);
+        console.error('Request Method:', apiError.config?.method);
+        console.error('Request Headers:', apiError.config?.headers);
+      }
+      console.error('=============================');
+      
+      // Re-throw with more context if it's an API error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as any;
+        const status = apiError.response?.status;
+        const data = apiError.response?.data;
+        
+        if (status === 400) {
+          throw new Error(data?.message || 'Invalid tenant ID provided');
+        } else if (status === 401) {
+          throw new Error('Authentication required to delete tenant');
+        } else if (status === 403) {
+          throw new Error('You do not have permission to delete this tenant');
+        } else if (status === 404) {
+          throw new Error('Tenant not found');
+        } else if (status >= 500) {
+          throw new Error('Server error occurred while deleting tenant');
+        }
+      }
+      
       throw error;
     }
   }

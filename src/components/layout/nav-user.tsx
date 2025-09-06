@@ -3,11 +3,13 @@
 import {
   BadgeCheck,
   Bell,
+  Building2,
   ChevronsUpDown,
   CreditCard,
   LogOut,
   User,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { useAuth } from "@/components/providers/auth-provider"
 import {
@@ -32,7 +34,8 @@ import {
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const { user, logout } = useAuth()
+  const { user, logout, tenant } = useAuth()
+  const router = useRouter()
   
   if (!user) {
     return null
@@ -85,10 +88,16 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
                 <User />
                 Profile
               </DropdownMenuItem>
+              {tenant && (
+                <DropdownMenuItem onClick={() => router.push('/dashboard/organization')}>
+                  <Building2 />
+                  Organization
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>

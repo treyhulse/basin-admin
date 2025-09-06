@@ -5,7 +5,7 @@ import axios from "axios";
 
 // Basin API configuration - using the working setup from basin.ts
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://basin-backend-production.up.railway.app";
-const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_24b15f4e520c747870e4c3aec89cd44cd322dba0074b654cee88009691d4a228";
+const BASIN_API_TOKEN = process.env.BASIN_API_TOKEN || "basin_29a1f0673f4f1a3bd4859b4223a6a1d25893f00d650e50e6d6445d4c3d64604f";
 
 // Create authenticated API instance for MCP tools
 const authenticatedAPI = axios.create({

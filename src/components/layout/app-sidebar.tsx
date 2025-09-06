@@ -10,6 +10,8 @@ import {
   ShieldUser,
   Wrench,
   Settings,
+  User,
+  Sparkles,
 } from "lucide-react"
 
 import { NavMain } from "@/components/layout/nav-main"
@@ -50,6 +52,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/dashboard/mcp/server",
         icon: Cpu,
         isActive: pathname === "/dashboard/mcp/server",
+      },
+      {
+        name: "MCP Client",
+        url: "/dashboard/client",
+        icon: Sparkles,
+        isActive: pathname === "/dashboard/client",
       },
       {
         name: "Tools",

@@ -10,6 +10,11 @@ const generateRequestId = () => `req_${Date.now()}_${Math.random().toString(36).
 export const api: AxiosInstance = axios.create({
   baseURL: config.api.baseURL,
   timeout: config.api.timeout,
+  // Add CORS configuration
+  withCredentials: false,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 /**
@@ -49,6 +54,18 @@ api.interceptors.request.use(
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Debug logging for tenant creation
+    if (config.url?.includes('/tenants') && config.method === 'post') {
+      console.log('=== TENANT API REQUEST DEBUG ===');
+      console.log('Full URL:', config.baseURL + config.url);
+      console.log('Method:', config.method);
+      console.log('Headers:', config.headers);
+      console.log('Data:', config.data);
+      console.log('Has Token:', !!token);
+      console.log('Token Preview:', token ? `${token.substring(0, 20)}...` : 'No token');
+      console.log('================================');
     }
     
     const logContext: LogContext = {

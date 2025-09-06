@@ -1,14 +1,50 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/auth-provider';
+import { useTenantManagement } from '@/hooks/use-tenant-management';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Users, Globe, Shield, Settings } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Building2, Users, Globe, Shield, Settings, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function OrganizationPage() {
-  const { tenant, user, session, auth } = useAuth();
+  const { tenant, user, session, auth, logout } = useAuth();
+  const { deleteTenant } = useTenantManagement();
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteTenant = async () => {
+    if (!tenant) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteTenant(tenant.id);
+      toast.success('Organization deleted successfully');
+      // Logout and redirect to login since the tenant is deleted
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Failed to delete tenant:', error);
+      toast.error('Failed to delete organization');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (!tenant) {
     return (
@@ -37,10 +73,39 @@ export default function OrganizationPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Organization</h1>
-        <Button variant="outline" size="sm">
-          <Settings className="h-4 w-4 mr-2" />
-          Settings
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm">
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" disabled={isDeleting}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Organization
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Organization</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete "{tenant.name}"? This action cannot be undone.
+                  All data associated with this organization will be permanently deleted.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteTenant}
+                  disabled={isDeleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Organization'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Organization Overview */}

@@ -110,6 +110,20 @@ export function useTenantManagement() {
     }
   }, [fetchTenants]);
 
+  /**
+   * Delete a tenant
+   */
+  const deleteTenant = useCallback(async (tenantId: string) => {
+    try {
+      await TenantService.deleteTenant(tenantId);
+      toast.success('Organization deleted successfully');
+      await fetchTenants();
+    } catch (error) {
+      console.error('Failed to delete tenant:', error);
+      toast.error('Failed to delete organization');
+    }
+  }, [fetchTenants]);
+
   // Fetch tenants on mount
   useEffect(() => {
     fetchTenants();
@@ -124,6 +138,7 @@ export function useTenantManagement() {
     createTenant,
     switchToTenant,
     joinTenant,
+    deleteTenant,
   };
 }
 
@@ -186,19 +201,29 @@ export function useTenantCreation() {
    * Submit form
    */
   const submitForm = useCallback(async (): Promise<boolean> => {
+    console.log('=== FORM SUBMISSION DEBUG ===');
+    console.log('Form data before validation:', formData);
+    
     if (!validateForm()) {
+      console.log('Form validation failed');
       return false;
     }
 
+    console.log('Form validation passed, submitting data:', formData);
     setIsSubmitting(true);
     try {
       const result = await createTenant(formData);
       if (result) {
+        console.log('Tenant created successfully:', result);
         // Reset form on success
         setFormData({ name: '', slug: '', domain: '' });
         setErrors({});
         return true;
       }
+      console.log('Tenant creation returned null/undefined');
+      return false;
+    } catch (error) {
+      console.error('Form submission error:', error);
       return false;
     } finally {
       setIsSubmitting(false);

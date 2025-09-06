@@ -27,10 +27,20 @@ export function TenantCreationDialog({ children, onSuccess }: TenantCreationDial
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== DIALOG SUBMIT DEBUG ===');
+    console.log('Form data at submit:', formData);
+    console.log('Form errors at submit:', errors);
+    console.log('Is submitting:', isSubmitting);
+    
     const success = await submitForm();
+    console.log('Submit form result:', success);
+    
     if (success) {
+      console.log('Success! Closing dialog and calling onSuccess');
       setOpen(false);
       onSuccess?.();
+    } else {
+      console.log('Submit failed, keeping dialog open');
     }
   };
 
