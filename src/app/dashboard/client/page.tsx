@@ -8,14 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Play, 
   RefreshCw, 
   CheckCircle, 
   XCircle, 
-  AlertCircle, 
   Terminal,
   Database,
   Users,
@@ -469,7 +467,7 @@ export default function MCPClientPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">MCP Client & Chat</h1>
+          <h1 className="text-3xl font-bold">MCP Client</h1>
           <p className="text-muted-foreground">AI Assistant with Basin Admin Tools</p>
         </div>
         <div className="flex items-center gap-4">
